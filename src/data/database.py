@@ -65,15 +65,16 @@ class Table:
         with self.db_manager as db:
             db.execute(query, tuple(conditions.values()))
 
-class Operators(Table):
+class Employee(Table):
     def __init__(self, db_manager: DatabaseManager):
-        super().__init__(db_manager, 'operators')
+        super().__init__(db_manager, 'employee')
         self.create_table([
             'id INTEGER PRIMARY KEY AUTOINCREMENT',
             'name TEXT NOT NULL',
             'role TEXT NOT NULL',
             'username TEXT UNIQUE NOT NULL',
-            'password TEXT NOT NULL'
+            'password TEXT NOT NULL',
+            'role TEXT NOT NULL CHECK (role IN ("Manager", "Technician", "Operator"))'
         ])
 
 class Customers(Table):
@@ -92,17 +93,17 @@ class Orders(Table):
         self.create_table([
             'id INTEGER PRIMARY KEY AUTOINCREMENT',
             'customer_id INTEGER NOT NULL',
-            'operator_id INTEGER NOT NULL',
+            'employee_id INTEGER NOT NULL',
             'order_date TEXT NOT NULL',
             'status TEXT NOT NULL',
             'FOREIGN KEY (customer_id) REFERENCES customers (id)',
-            'FOREIGN KEY (operator_id) REFERENCES operators (id)'
+            'FOREIGN KEY (employee_id) REFERENCES employee (id)'
         ])
 
 class MESDatabase:
     def __init__(self, db_name: str):
         self.db_manager = DatabaseManager(db_name)
-        self.operators = Operators(self.db_manager)
+        self.employees = Employee(self.db_manager)
         self.customers = Customers(self.db_manager)
         self.orders = Orders(self.db_manager)
 
