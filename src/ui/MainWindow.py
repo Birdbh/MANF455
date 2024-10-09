@@ -9,6 +9,7 @@ sys.path.append(os.path.dirname(SCRIPT_DIR))
 from ui import OperatorWindow
 from ui import ManagerWindow
 from ui import MaintnanceTechnicianWindow
+from ui import SignInWindow
 
 #This should be a constant in the future
 #UI_TEMPLATES
@@ -46,9 +47,17 @@ class MainWindow(QMainWindow):
 
         # Create our templates and add them to the stacked widget
         self.sign_in_template = SignInWindow.SignInWindow()
-        self.operator_template = OperatorWindow.OperatorWindow
-        self.technician_template = MaintenanceTechnicianWindow.MaintnanceTechnicianWindow()
+        self.stacked_widget.addWidget(self.sign_in_template)
+
+        self.operator_template = OperatorWindow.OperatorWindow()
+        self.stacked_widget.addWidget(self.operator_template)
+
+        self.technician_template = MaintnanceTechnicianWindow.MaintnanceTechnicianWindow()
+        self.stacked_widget.addWidget(self.technician_template)
+        
         self.manager_template = ManagerWindow.ManagerWindow()
+        self.stacked_widget.addWidget(self.manager_template)
+
 
         # Set the initial template to the sign-in template
         self.stacked_widget.setCurrentWidget(self.sign_in_template)
