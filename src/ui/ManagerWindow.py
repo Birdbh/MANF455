@@ -1,9 +1,6 @@
 from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog
 import pandas as pd
-import plotly.graph_objects as go
-from plotly.offline import plot
-import sys
-from PyQt5.QtWebEngineWidgets import *
+import pyqtgraph as pg
 
 class ManagerWindow(QWidget):
     def __init__(self):
@@ -14,14 +11,13 @@ class ManagerWindow(QWidget):
         layout.addWidget(QLabel("Manager Template"))
 
         # Buttons
-        layout.addWidget(QPushButton("View OEE", clicked=self.display_oee))
         layout.addWidget(QPushButton("Generate Reports"))
         layout.addWidget(QPushButton("Manage Users"))
         
         # Table for Employees
         self.table = QTableWidget()
         self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["Employee Name", "Hours Worked", "Position"])
+        self.table.setHorizontalHeaderLabels(["Employee Name", "Hours Worked"])
         self.populate_employee_table()
         layout.addWidget(self.table)
 
@@ -30,11 +26,19 @@ class ManagerWindow(QWidget):
         export_button.clicked.connect(self.export_to_csv)
         layout.addWidget(export_button)
 
-        # Plotly chart display
-        self.chart_view = QWebEngineView()
-        layout.addWidget(self.chart_view)
+        #chart display
+        self.plot_graph = pg.PlotWidget()
+        layout.addWidget(self.plot_graph)
+        self.plot_graph.plot(*self.getOEEData())
 
         self.setLayout(layout)
+
+    #this needs to be moved into the data and report class, currently just to test data
+    def getOEEData(self):
+        # Example data, replace with actual OEE data as needed
+        time = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+        temperature = [30, 32, 34, 32, 33, 31, 29, 32, 35, 30]
+        return time, temperature
 
     def populate_employee_table(self):
         # Example data, replace with actual employee data as needed
@@ -49,20 +53,6 @@ class ManagerWindow(QWidget):
             self.table.setItem(row_idx, 0, QTableWidgetItem(name))
             self.table.setItem(row_idx, 1, QTableWidgetItem(str(hours)))
             self.table.setItem(row_idx, 2, QTableWidgetItem(position))
-
-    def display_oee(self):
-        # Example OEE data, replace with actual calculations
-        categories = ['Availability', 'Performance', 'Quality']
-        values = [80, 75, 90]
-
-        fig = go.Figure(data=[
-            go.Bar(name='OEE', x=categories, y=values)
-        ])
-        fig.update_layout(title='Overall Equipment Effectiveness (OEE)', barmode='group')
-
-        # Save plot to HTML and display in the web view
-        plot_div = plot(fig, include_plotlyjs='cdn', output_type='div')
-        self.chart_view.setHtml(plot_div)
 
     def export_to_csv(self):
         options = QFileDialog.Options()
