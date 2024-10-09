@@ -17,7 +17,7 @@ class ManagerWindow(QWidget):
         # Table for Employees
         self.table = QTableWidget()
         self.table.setColumnCount(3)
-        self.table.setHorizontalHeaderLabels(["Employee Name", "Hours Worked"])
+        self.table.setHorizontalHeaderLabels(["Employee Name", "Hours Worked", "Position"])
         self.populate_employee_table()
         layout.addWidget(self.table)
 
@@ -42,6 +42,7 @@ class ManagerWindow(QWidget):
 
     def populate_employee_table(self):
         # Example data, replace with actual employee data as needed
+        #this will need to be pulled from an operator tracking database
         employees = [
             ("Alice", 40, "Operator"),
             ("Bob", 35, "Technician"),
