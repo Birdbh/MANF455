@@ -1,6 +1,9 @@
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QPushButton, QLabel, QStackedWidget,QLineEdit,QComboBox,QTimeEdit,QDateTimeEdit)
 
+from data import MESDatabase
+from data import Orders
+
 class OperatorWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -51,7 +54,13 @@ class OperatorWindow(QWidget):
         drilling_operation = self.findChild(QComboBox).currentText()
         start_time = self.findChild(QDateTimeEdit).dateTime()
         
-        print("test")
-        #still Needs to be implemented
-        #MES_Logic.create_work_order(customer_id, drilling_operation, start_time)
+
+        # Add a new entry to the Order database
+        db = MESDatabase.MESDatabase("mes.db")
+        db.operators.insert({
+            'customer_id': customer_id,
+            'employee_id': 1,  # Assuming employee_id is fixed or obtained elsewhere in the actual implementation
+            'order_date': start_time,
+            'status': 'pending'  # Example status, this can be changed based on your requirements
+        })
 
