@@ -30,3 +30,6 @@ class OrderTable:
 
     def get_all_orders(self):
         return self.connection.execute('SELECT * FROM orders').fetchall()
+    
+    def get_last_row_id(self):
+        return self.connection.execute('SELECT orderId FROM orders ORDER BY orderId DESC LIMIT 1').fetchone()[0]

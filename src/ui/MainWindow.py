@@ -62,7 +62,7 @@ class MainWindow(QMainWindow):
         
         emp = Employee.EmployeeTable()
 
-        authentication_role = Employee.EmployeeTable().validate_user(username, password)
+        authentication_role = emp.validate_user(username, password)
         if authentication_role is not None:
             self.show_template(authentication_role)
             print(authentication_role)

@@ -8,7 +8,7 @@ class ManagerWindow(QWidget):
 
         # Main layout
         layout = QVBoxLayout()
-        layout.addWidget(QLabel("Manager Template"))
+        layout.addWidget(QLabel("Manager"))
 
         # Buttons
         layout.addWidget(QPushButton("Generate Reports"))

@@ -1,79 +1,70 @@
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QPushButton, QLabel, QStackedWidget,QLineEdit,QComboBox,QTimeEdit,QDateTimeEdit, QTableWidget, QTableWidgetItem)
+from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit,
+                             QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem)
 
-#from data2 import MESDatabase
 from data2 import Order
 
 class OperatorWindow(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Operator Template"))
-        self.widget_to_see_work_orders()
-        layout.addWidget(self.table)
-        layout.addWidget(self.widget_to_create_work_order())
-        layout.addWidget(QPushButton("View Work Orders"))
+        layout = QVBoxLayout(self)
 
+        layout.addWidget(QLabel("Operator Template"))
+        self.setup_work_order_table()
+        layout.addWidget(self.table)
+
+        layout.addWidget(self.create_work_order_widget())
         self.setLayout(layout)
 
-    def widget_to_see_work_orders(self):
-
-        self.table = QTableWidget()
-        self.table.setColumnCount(5)
+    def setup_work_order_table(self):
+        self.table = QTableWidget(0, 5)
         self.table.setHorizontalHeaderLabels(["Work Order ID", "Customer ID", "Drilling Operation", "Start Time", "Status"])
         self.populate_work_order_table()
 
     def populate_work_order_table(self):
-
         work_orders = Order.OrderTable().get_all_orders()
-        self.table.setRowCount(len(work_orders))
-        for row_idx, work_order in enumerate(work_orders):
-            self.table.setItem(row_idx, 0, QTableWidgetItem(str(work_order[0])))
-            self.table.setItem(row_idx, 1, QTableWidgetItem(str(work_order[1])))
-            self.table.setItem(row_idx, 2, QTableWidgetItem(str(work_order[2])))
-            self.table.setItem(row_idx, 3, QTableWidgetItem(str(work_order[3])))
-            self.table.setItem(row_idx, 4, QTableWidgetItem(str(work_order[4])))
+        for work_order in work_orders:
+            self.add_work_order_to_table(work_order)
 
-    def widget_to_create_work_order(self):
-        # Create a widget to create a work order
+    def add_work_order_to_table(self, work_order):
+        row_idx = self.table.rowCount()
+        self.table.insertRow(row_idx)
+        for col_idx, item in enumerate(work_order):
+            self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(item)))
+
+    def create_work_order_widget(self):
         customer_id = QLineEdit()
         drilling_operation = QComboBox()
-        drilling_operation.addItem("1")
-        drilling_operation.addItem("2")
-        drilling_operation.addItem("3")
+        drilling_operation.addItems(["1", "2", "3"])
         start_time = QDateTimeEdit()
-        #Create a button to submit the work order
+
         submit_button = QPushButton("Submit Work Order")
-        submit_button.clicked.connect(self.submit_work_order)
+        submit_button.clicked.connect(lambda: self.submit_work_order(
+            int(customer_id.text()),
+            int(drilling_operation.currentText()),
+            start_time.dateTime().toString("yyyy-MM-dd hh:mm:ss")
+        ))
 
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Create Work Order"))
         layout.addWidget(QLabel("Customer ID"))
         layout.addWidget(customer_id)
-        layout.addWidget(QLabel("Select Drilling Operation Type"))
+        layout.addWidget(QLabel("Drilling Operation"))
         layout.addWidget(drilling_operation)
         layout.addWidget(QLabel("Start Time"))
         layout.addWidget(start_time)
         layout.addWidget(submit_button)
 
-        widget=QWidget()
+        widget = QWidget()
         widget.setLayout(layout)
         return widget
 
-
-    def submit_work_order(self):
-        customer_id = int(self.findChild(QLineEdit).text())
-        drilling_operation = int(self.findChild(QComboBox).currentText())
-        start_time = self.findChild(QDateTimeEdit).dateTime().toString("yyyy-MM-dd hh:mm:ss")
-
-        # Add a new entry to the Order database
+    def submit_work_order(self, customer_id, drilling_operation, start_time):
+        # Add new order to the database
         order = Order.OrderTable()
-        order.add_order(
-            customer_id,
-            drilling_operation,
-            start_time,
-            "pending"
-        )
+        order.add_order(customer_id, drilling_operation, start_time, "pending")
 
-        self.table.update()
+        new_order_id = order.get_last_row_id()
 
+        # Add the new work order directly to the table
+        new_work_order = (new_order_id, customer_id, drilling_operation, start_time, "pending")
+        self.add_work_order_to_table(new_work_order)
