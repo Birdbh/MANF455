@@ -8,7 +8,7 @@ class OperatorWindow(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout(self)
 
-        layout.addWidget(QLabel("Operator Template"))
+        layout.addWidget(QLabel("Operator"))
         self.setup_work_order_table()
         layout.addWidget(self.table)
 

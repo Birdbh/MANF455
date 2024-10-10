@@ -25,6 +25,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Manufacturing Execution System')
         self.setGeometry(WINDOW_SIZE_AX, WINDOW_SIZE_AY, WINDOW_SIZE_AW, WINDOW_SIZE_AH)
         self.generateUIStructureWidget()
+        self.showMaximized()
 
     def generateUIStructureWidget(self):
         # Create a central widget and a layout for it
