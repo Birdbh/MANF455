@@ -1,11 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QStackedWidget, QLineEdit, QMessageBox
-import sys
 
-import os
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.dirname(SCRIPT_DIR))
-
+from data2 import Employee
 from ui import OperatorWindow
 from ui import ManagerWindow
 from ui import MaintnanceTechnicianWindow
@@ -13,28 +8,25 @@ from ui import SignInWindow
 
 #This should be a constant in the future
 #UI_TEMPLATES
-#WINDOW_SIZE
+
+WINDOW_SIZE_AX=100
+WINDOW_SIZE_AY=100
+WINDOW_SIZE_AW=800
+WINDOW_SIZE_AH=600
 
 class MainWindow(QMainWindow):
-    def __init__(self, mes_logic):
+    def __init__(self):
         super().__init__()
-        self.mes_logic = mes_logic
         self.init_ui()
 
 
     def init_ui(self):
         #Create a main window
         self.setWindowTitle('Manufacturing Execution System')
-        self.setGeometry(100, 100, 800, 600)
+        self.setGeometry(WINDOW_SIZE_AX, WINDOW_SIZE_AY, WINDOW_SIZE_AW, WINDOW_SIZE_AH)
         self.generateUIStructureWidget()
-        pass
 
     def generateUIStructureWidget(self):
-        central_widget = QWidget()
-        main_layout = QVBoxLayout()
-        central_widget.setLayout(main_layout)
-        self.setCentralWidget(central_widget)
-
         # Create a central widget and a layout for it
         central_widget = QWidget()
         main_layout = QVBoxLayout()
@@ -58,7 +50,6 @@ class MainWindow(QMainWindow):
         self.manager_template = ManagerWindow.ManagerWindow()
         self.stacked_widget.addWidget(self.manager_template)
 
-
         # Set the initial template to the sign-in template
         self.stacked_widget.setCurrentWidget(self.sign_in_template)
 
@@ -69,20 +60,19 @@ class MainWindow(QMainWindow):
         username = self.sign_in_template.username_input.text()
         password = self.sign_in_template.password_input.text()
         
-        # This is a placeholder authentication logic. Replace with your actual authentication system.
-        if username == "operator" and password == "password":
-            self.show_template("operator")
-        elif username == "technician" and password == "password":
-            self.show_template("technician")
-        elif username == "manager" and password == "password":
-            self.show_template("manager")
+        emp = Employee.EmployeeTable()
+
+        authentication_role = Employee.EmployeeTable().validate_user(username, password)
+        if authentication_role is not None:
+            self.show_template(authentication_role)
+            print(authentication_role)
         else:
             QMessageBox.warning(self, "Login Failed", "Invalid username or password")
 
     def show_template(self, user_type):
-        if user_type == "operator":
+        if user_type == "Operator":
             self.stacked_widget.setCurrentWidget(self.operator_template)
-        elif user_type == "technician":
+        elif user_type == "Technician":
             self.stacked_widget.setCurrentWidget(self.technician_template)
-        elif user_type == "manager":
+        elif user_type == "Manager":
             self.stacked_widget.setCurrentWidget(self.manager_template)

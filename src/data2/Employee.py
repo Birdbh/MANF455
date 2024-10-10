@@ -11,11 +11,12 @@ class EmployeeTable:
         if self.connection.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='employee';").fetchone() is None:
             self.connection.execute(
                 'CREATE TABLE employee ('
-                'employeeId INTEGER PRIMARY KEY AUTOINCREMENT',
-                'name TEXT NOT NULL',
-                'username TEXT UNIQUE NOT NULL',
-                'password TEXT NOT NULL',
+                'employeeId INTEGER PRIMARY KEY AUTOINCREMENT,'
+                'name TEXT NOT NULL,'
+                'username TEXT UNIQUE NOT NULL,'
+                'password TEXT NOT NULL,'
                 'role TEXT NOT NULL CHECK (role IN ("Manager", "Technician", "Operator"))'
+                ')'
             )
             self.connection.commit()
 
@@ -31,3 +32,9 @@ class EmployeeTable:
     
     def get_all_operators(self):
         return self.connection.execute('SELECT * FROM employee WHERE role = "Operator"').fetchall()
+    
+    def validate_user(self, username, password):
+        query_results = self.connection.execute('SELECT * FROM employee WHERE username = ? AND password = ?', (username, password)).fetchone()
+        if query_results is not None:
+            #return the role of the user
+            return query_results[4]
