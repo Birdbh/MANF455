@@ -1,5 +1,6 @@
 import sqlite3
 from data2 import DatabaseConnector
+from datetime import datetime
 
 class OrderTable:
     def __init__(self):
@@ -11,21 +12,19 @@ class OrderTable:
         if self.connection.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='orders';").fetchone() is None:
             self.connection.execute(
                 'CREATE TABLE orders ('
-                'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+                'orderId INTEGER PRIMARY KEY AUTOINCREMENT,'
                 'customer_id INTEGER NOT NULL,'
-                'employee_id INTEGER NOT NULL,'
+                'drilling_operation INTEGER NOT NULL,'
                 'order_date TEXT NOT NULL,'
-                'status TEXT NOT NULL,'
-                'FOREIGN KEY (customer_id) REFERENCES customers (id),'
-                'FOREIGN KEY (employee_id) REFERENCES employee (id)'
+                'status TEXT NOT NULL'
                 ')'
             )
             self.connection.commit()
 
-    def add_order(self, customer_id: int, employee_id: int, order_date: str, status: str):
+    def add_order(self, customer_id: int, drilling_operation: int, order_date: str, status: str):
         self.connection.execute(
-            'INSERT INTO orders (customer_id, employee_id, order_date, status) VALUES (?, ?, ?, ?)',
-            (customer_id, employee_id, order_date, status)
+            'INSERT INTO orders (customer_id, drilling_operation, order_date, status) VALUES (?, ?, ?, ?)',
+            (customer_id, drilling_operation, order_date, status)
         )
         self.connection.commit()
 

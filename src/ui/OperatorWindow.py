@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QPushButton, QLabel, QStackedWidget,QLineEdit,QComboBox,QTimeEdit,QDateTimeEdit)
 
-from data import MESDatabase
-from data import Orders
+#from data2 import MESDatabase
+from data2 import Order
 
 class OperatorWindow(QWidget):
     def __init__(self, parent=None):
@@ -23,9 +23,9 @@ class OperatorWindow(QWidget):
         #Time select to select the start time of the operation
         customer_id = QLineEdit()
         drilling_operation = QComboBox()
-        drilling_operation.addItem("Drilling Operation 1")
-        drilling_operation.addItem("Drilling Operation 2")
-        drilling_operation.addItem("Drilling Operation 3")
+        drilling_operation.addItem("1")
+        drilling_operation.addItem("2")
+        drilling_operation.addItem("3")
         start_time = QDateTimeEdit()
         #Create a button to submit the work order
         submit_button = QPushButton("Submit Work Order")
@@ -35,7 +35,7 @@ class OperatorWindow(QWidget):
         layout.addWidget(QLabel("Create Work Order"))
         layout.addWidget(QLabel("Customer ID"))
         layout.addWidget(customer_id)
-        layout.addWidget(QLabel("Drilling Operation"))
+        layout.addWidget(QLabel("Select Drilling Operation Type"))
         layout.addWidget(drilling_operation)
         layout.addWidget(QLabel("Start Time"))
         layout.addWidget(start_time)
@@ -50,17 +50,22 @@ class OperatorWindow(QWidget):
 #this function should take the values from the fields and create a work order
 #this function should then call the MES logic to create the work order
     def submit_work_order(self):
-        customer_id = self.findChild(QLineEdit).text()
-        drilling_operation = self.findChild(QComboBox).currentText()
-        start_time = self.findChild(QDateTimeEdit).dateTime()
-        
-
+        customer_id = int(self.findChild(QLineEdit).text())
+        drilling_operation = int(self.findChild(QComboBox).currentText())
+        start_time = self.findChild(QDateTimeEdit).dateTime().toString("yyyy-MM-dd hh:mm:ss")
+        print(type(customer_id))
+        print(customer_id)
+        print(type(drilling_operation))
+        print(drilling_operation)
+        print(type(start_time))
+        print(start_time)
         # Add a new entry to the Order database
-        db = MESDatabase.MESDatabase("mes.db")
-        db.operators.insert({
-            'customer_id': customer_id,
-            'employee_id': 1,  # Assuming employee_id is fixed or obtained elsewhere in the actual implementation
-            'order_date': start_time,
-            'status': 'pending'  # Example status, this can be changed based on your requirements
-        })
+        order = Order.OrderTable()
+        order.add_order(
+            customer_id,
+            drilling_operation,
+            start_time,
+            "pending"
+        )
+        print(order.get_all_orders())
 
