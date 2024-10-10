@@ -13,17 +13,16 @@ class EmployeeTable:
                 'CREATE TABLE employee ('
                 'employeeId INTEGER PRIMARY KEY AUTOINCREMENT',
                 'name TEXT NOT NULL',
-                'role TEXT NOT NULL',
                 'username TEXT UNIQUE NOT NULL',
                 'password TEXT NOT NULL',
                 'role TEXT NOT NULL CHECK (role IN ("Manager", "Technician", "Operator"))'
             )
             self.connection.commit()
 
-    def add_employee(self, name: str, role: str, username: str, password: str):
+    def add_employee(self, name: str, username: str, password: str, role: str,):
         self.connection.execute(
-            'INSERT INTO employee (name, role, username, password) VALUES (?, ?, ?, ?)',
-            (name, role, username, password)
+            'INSERT INTO employee (name, username, password, role) VALUES (?, ?, ?, ?)',
+            (name, username, password, role)
         )
         self.connection.commit()
 

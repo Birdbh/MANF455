@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                             QHBoxLayout, QPushButton, QLabel, QStackedWidget,QLineEdit,QComboBox,QTimeEdit,QDateTimeEdit)
+                             QHBoxLayout, QPushButton, QLabel, QStackedWidget,QLineEdit,QComboBox,QTimeEdit,QDateTimeEdit, QTableWidget, QTableWidgetItem)
 
 #from data2 import MESDatabase
 from data2 import Order
@@ -9,18 +9,33 @@ class OperatorWindow(QWidget):
         super().__init__(parent)
         layout = QVBoxLayout()
         layout.addWidget(QLabel("Operator Template"))
+        self.widget_to_see_work_orders()
+        layout.addWidget(self.table)
         layout.addWidget(self.widget_to_create_work_order())
         layout.addWidget(QPushButton("View Work Orders"))
 
         self.setLayout(layout)
-        
+
+    def widget_to_see_work_orders(self):
+
+        self.table = QTableWidget()
+        self.table.setColumnCount(5)
+        self.table.setHorizontalHeaderLabels(["Work Order ID", "Customer ID", "Drilling Operation", "Start Time", "Status"])
+        self.populate_work_order_table()
+
+    def populate_work_order_table(self):
+
+        work_orders = Order.OrderTable().get_all_orders()
+        self.table.setRowCount(len(work_orders))
+        for row_idx, work_order in enumerate(work_orders):
+            self.table.setItem(row_idx, 0, QTableWidgetItem(str(work_order[0])))
+            self.table.setItem(row_idx, 1, QTableWidgetItem(str(work_order[1])))
+            self.table.setItem(row_idx, 2, QTableWidgetItem(str(work_order[2])))
+            self.table.setItem(row_idx, 3, QTableWidgetItem(str(work_order[3])))
+            self.table.setItem(row_idx, 4, QTableWidgetItem(str(work_order[4])))
 
     def widget_to_create_work_order(self):
         # Create a widget to create a work order
-        #This should have the following fields:
-        #Enter number for customer id
-        #dropdown to select drilling operation
-        #Time select to select the start time of the operation
         customer_id = QLineEdit()
         drilling_operation = QComboBox()
         drilling_operation.addItem("1")
@@ -46,19 +61,11 @@ class OperatorWindow(QWidget):
         return widget
 
 
-#create a function to handle when the submit_buttom is clicked
-#this function should take the values from the fields and create a work order
-#this function should then call the MES logic to create the work order
     def submit_work_order(self):
         customer_id = int(self.findChild(QLineEdit).text())
         drilling_operation = int(self.findChild(QComboBox).currentText())
         start_time = self.findChild(QDateTimeEdit).dateTime().toString("yyyy-MM-dd hh:mm:ss")
-        print(type(customer_id))
-        print(customer_id)
-        print(type(drilling_operation))
-        print(drilling_operation)
-        print(type(start_time))
-        print(start_time)
+
         # Add a new entry to the Order database
         order = Order.OrderTable()
         order.add_order(
@@ -67,5 +74,6 @@ class OperatorWindow(QWidget):
             start_time,
             "pending"
         )
-        print(order.get_all_orders())
+
+        self.table.update()
 
