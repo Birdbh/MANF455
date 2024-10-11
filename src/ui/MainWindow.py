@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHB
 from data2 import Employee
 from ui import OperatorWindow
 from ui import ManagerWindow
-from ui import MaintnanceTechnicianWindow
+from ui import MaintenanceTechnicianWindow
 from ui import SignInWindow
 
 #This should be a constant in the future
@@ -62,6 +62,6 @@ class MainWindow(QMainWindow):
         if role == "Operator":
             self.setCentralWidget(OperatorWindow.OperatorWindow(employee_id, employee_name))
         elif role == "Technician":
-            self.setCentralWidget(MaintnanceTechnicianWindow.MaintnanceTechnicianWindow(employee_id, employee_name))
+            self.setCentralWidget(MaintenanceTechnicianWindow.MaintenanceTechnicianWindow(employee_id, employee_name))
         elif role == "Manager":
             self.setCentralWidget(ManagerWindow.ManagerWindow(employee_id, employee_name))
