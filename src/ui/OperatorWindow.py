@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QLabel, QLineEdit,
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QLineEdit,
                              QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem)
-
+from PyQt5.QtCore import Qt
 from data2 import Order
 
 class OperatorWindow(QWidget):
@@ -8,66 +8,96 @@ class OperatorWindow(QWidget):
         super().__init__()
         self.employee_id = employee_id
         self.employee_name = employee_name
+        self.order_table = Order.OrderTable()
+        self.editable_columns = [2, 3]  # Drilling Operation and Start Time are editable
 
-        layout = QVBoxLayout()
+        self._init_ui()
+
+    def _init_ui(self):
+        layout = QVBoxLayout(self)
         layout.addWidget(QLabel(f"Operator: {self.employee_name} (ID: {self.employee_id})"))
-        layout.addWidget(QLabel("Operator"))
-        self.setup_work_order_table()
+        
+        self._setup_work_order_table()
         layout.addWidget(self.table)
+        
+        layout.addWidget(self._create_work_order_widget())
 
-        layout.addWidget(self.create_work_order_widget())
-        self.setLayout(layout)
-
-    def setup_work_order_table(self):
+    def _setup_work_order_table(self):
         self.table = QTableWidget(0, 5)
         self.table.setHorizontalHeaderLabels(["Work Order ID", "Customer ID", "Drilling Operation", "Start Time", "Status"])
-        self.populate_work_order_table()
+        self.table.itemChanged.connect(self._handle_item_changed)
+        self._populate_work_order_table()
 
-    def populate_work_order_table(self):
-        work_orders = Order.OrderTable().get_all_orders()
+    def _populate_work_order_table(self):
+        work_orders = self.order_table.get_all_orders()
         for work_order in work_orders:
-            self.add_work_order_to_table(work_order)
+            self._add_work_order_to_table(work_order)
 
-    def add_work_order_to_table(self, work_order):
+    def _add_work_order_to_table(self, work_order):
         row_idx = self.table.rowCount()
         self.table.insertRow(row_idx)
         for col_idx, item in enumerate(work_order):
-            self.table.setItem(row_idx, col_idx, QTableWidgetItem(str(item)))
+            table_item = QTableWidgetItem(str(item))
+            if col_idx not in self.editable_columns:
+                table_item.setFlags(table_item.flags() & ~Qt.ItemIsEditable)
+            self.table.setItem(row_idx, col_idx, table_item)
 
-    def create_work_order_widget(self):
-        customer_id = QLineEdit()
-        drilling_operation = QComboBox()
-        drilling_operation.addItems(["1", "2", "3"])
-        start_time = QDateTimeEdit()
+    def _create_work_order_widget(self):
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.addWidget(QLabel("Create Work Order"))
+
+        self.customer_id = QLineEdit()
+        self.drilling_operation = QComboBox()
+        self.drilling_operation.addItems(["1", "2", "3"])
+        self.start_time = QDateTimeEdit()
+
+        for label, w in [("Customer ID", self.customer_id),
+                         ("Drilling Operation", self.drilling_operation),
+                         ("Start Time", self.start_time)]:
+            layout.addWidget(QLabel(label))
+            layout.addWidget(w)
 
         submit_button = QPushButton("Submit Work Order")
-        submit_button.clicked.connect(lambda: self.submit_work_order(
-            int(customer_id.text()),
-            int(drilling_operation.currentText()),
-            start_time.dateTime().toString("yyyy-MM-dd hh:mm:ss")
-        ))
-
-        layout = QVBoxLayout()
-        layout.addWidget(QLabel("Create Work Order"))
-        layout.addWidget(QLabel("Customer ID"))
-        layout.addWidget(customer_id)
-        layout.addWidget(QLabel("Drilling Operation"))
-        layout.addWidget(drilling_operation)
-        layout.addWidget(QLabel("Start Time"))
-        layout.addWidget(start_time)
+        submit_button.clicked.connect(self._submit_work_order)
         layout.addWidget(submit_button)
 
-        widget = QWidget()
-        widget.setLayout(layout)
         return widget
 
-    def submit_work_order(self, customer_id, drilling_operation, start_time):
-        # Add new order to the database
-        order = Order.OrderTable()
-        order.add_order(customer_id, drilling_operation, start_time, "pending")
+    def _submit_work_order(self):
+        customer_id = int(self.customer_id.text())
+        drilling_operation = int(self.drilling_operation.currentText())
+        start_time = self.start_time.dateTime().toString("yyyy-MM-dd hh:mm:ss")
 
-        new_order_id = order.get_last_row_id()
+        self.order_table.add_order(customer_id, drilling_operation, start_time, "pending")
+        new_order_id = self.order_table.get_last_row_id()
 
-        # Add the new work order directly to the table
         new_work_order = (new_order_id, customer_id, drilling_operation, start_time, "pending")
-        self.add_work_order_to_table(new_work_order)
+        self._add_work_order_to_table(new_work_order)
+
+        # Clear input fields after submission
+        self.customer_id.clear()
+        self.drilling_operation.setCurrentIndex(0)
+        self.start_time.setDateTime(QDateTimeEdit().dateTime())
+
+    def _handle_item_changed(self, item):
+        if item.column() in self.editable_columns:
+            row = item.row()
+            work_order_id = int(self.table.item(row, 0).text())
+            column = item.column()
+            new_value = item.text()
+
+            if column == 2:  # Drilling Operation
+                self.order_table.update_drilling_operation(work_order_id, int(new_value))
+            elif column == 3:  # Start Time
+                self.order_table.update_start_time(work_order_id, new_value)
+
+    def update_order_status(self, work_order_id, new_status):
+        # Update the status in the database
+        self.order_table.update_status(work_order_id, new_status)
+
+        # Update the status in the table
+        for row in range(self.table.rowCount()):
+            if int(self.table.item(row, 0).text()) == work_order_id:
+                self.table.item(row, 4).setText(new_status)
+                break

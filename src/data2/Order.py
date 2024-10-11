@@ -33,3 +33,11 @@ class OrderTable:
     
     def get_last_row_id(self):
         return self.connection.execute('SELECT orderId FROM orders ORDER BY orderId DESC LIMIT 1').fetchone()[0]
+    
+    def update_drilling_operation(self, order_id: int, new_drilling_operation: int):
+        self.connection.execute('UPDATE orders SET drilling_operation = ? WHERE orderId = ?', (new_drilling_operation, order_id))
+        self.connection.commit()
+
+    def update_start_time(self, order_id: int, new_start_time: str):
+        self.connection.execute('UPDATE orders SET order_date = ? WHERE orderId = ?', (new_start_time, order_id))
+        self.connection.commit()
