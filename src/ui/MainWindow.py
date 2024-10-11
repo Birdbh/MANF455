@@ -50,7 +50,7 @@ class MainWindow(QMainWindow):
         emp = Employee.EmployeeTable()
 
         # Get employee details
-        employee = emp.get_employee_details(username, password)
+        employee = emp.authenticate_employee_details(username, password)
 
         if employee is not None:
             employee_id, employee_name, role = employee[0], employee[1], employee[2]

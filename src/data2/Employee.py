@@ -33,8 +33,12 @@ class EmployeeTable:
     def get_all_operators(self):
         return self.connection.execute('SELECT * FROM employee WHERE role = "Operator"').fetchall()
     
-    def get_employee_details(self, username, password):
+    def authenticate_employee_details(self, username, password):
         return self.connection.execute(
             'SELECT employeeId, name, role FROM employee WHERE username = ? AND password = ?',
             (username, password)
         ).fetchone()
+    
+    def get_employee_details(self):
+        return self.connection.execute('SELECT employeeID, name, role FROM employee').fetchall()
+        
