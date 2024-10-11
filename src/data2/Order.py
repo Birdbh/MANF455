@@ -16,15 +16,16 @@ class OrderTable:
                 'customer_id INTEGER NOT NULL,'
                 'drilling_operation INTEGER NOT NULL,'
                 'order_date TEXT NOT NULL,'
-                'status TEXT NOT NULL'
+                'status TEXT NOT NULL,'
+                'passQualityControl BOOLEAN NOT NULL'
                 ')'
             )
             self.connection.commit()
 
-    def add_order(self, customer_id: int, drilling_operation: int, order_date: str, status: str):
+    def add_order(self, customer_id: int, drilling_operation: int, order_date: str, status: str, passQualityControl: bool):
         self.connection.execute(
-            'INSERT INTO orders (customer_id, drilling_operation, order_date, status) VALUES (?, ?, ?, ?)',
-            (customer_id, drilling_operation, order_date, status)
+            'INSERT INTO orders (customer_id, drilling_operation, order_date, status, passQualityControl) VALUES (?, ?, ?, ?, ?)',
+            (customer_id, drilling_operation, order_date, status, passQualityControl)
         )
         self.connection.commit()
 
@@ -40,4 +41,12 @@ class OrderTable:
 
     def update_start_time(self, order_id: int, new_start_time: str):
         self.connection.execute('UPDATE orders SET order_date = ? WHERE orderId = ?', (new_start_time, order_id))
+        self.connection.commit()
+
+    def update_status(self, order_id: int, new_status: str):
+        self.connection.execute('UPDATE orders SET status = ? WHERE orderId = ?', (new_status, order_id))
+        self.connection.commit()
+    
+    def update_pass_quality_control(self, order_id: int, new_pass_quality_control: bool):
+        self.connection.execute('UPDATE orders SET passQualityControl = ? WHERE orderId = ?', (new_pass_quality_control, order_id))
         self.connection.commit()

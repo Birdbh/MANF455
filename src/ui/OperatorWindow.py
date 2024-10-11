@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QLineEdit,
-                             QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem)
+                             QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView)
 from PyQt5.QtCore import Qt
 from data2 import Order
 
@@ -9,7 +9,7 @@ class OperatorWindow(QWidget):
         self.employee_id = employee_id
         self.employee_name = employee_name
         self.order_table = Order.OrderTable()
-        self.editable_columns = [2, 3]  # Drilling Operation and Start Time are editable
+        self.editable_columns = [2, 3, 5]  # Drilling Operation, Start Time, and Pass Quality Control are editable
 
         self._init_ui()
 
@@ -23,8 +23,9 @@ class OperatorWindow(QWidget):
         layout.addWidget(self._create_work_order_widget())
 
     def _setup_work_order_table(self):
-        self.table = QTableWidget(0, 5)
-        self.table.setHorizontalHeaderLabels(["Work Order ID", "Customer ID", "Drilling Operation", "Start Time", "Status"])
+        self.table = QTableWidget(0, 6)
+        self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.table.setHorizontalHeaderLabels(["Work Order ID", "Customer ID", "Drilling Operation", "Start Time", "Status", "Pass Quality Control"])
         self.table.itemChanged.connect(self._handle_item_changed)
         self._populate_work_order_table()
 
@@ -69,10 +70,10 @@ class OperatorWindow(QWidget):
         drilling_operation = int(self.drilling_operation.currentText())
         start_time = self.start_time.dateTime().toString("yyyy-MM-dd hh:mm:ss")
 
-        self.order_table.add_order(customer_id, drilling_operation, start_time, "pending")
+        self.order_table.add_order(customer_id, drilling_operation, start_time, "pending", True)
         new_order_id = self.order_table.get_last_row_id()
 
-        new_work_order = (new_order_id, customer_id, drilling_operation, start_time, "pending")
+        new_work_order = (new_order_id, customer_id, drilling_operation, start_time, "pending", True)
         self._add_work_order_to_table(new_work_order)
 
         # Clear input fields after submission
@@ -91,6 +92,10 @@ class OperatorWindow(QWidget):
                 self.order_table.update_drilling_operation(work_order_id, int(new_value))
             elif column == 3:  # Start Time
                 self.order_table.update_start_time(work_order_id, new_value)
+            elif column == 5: # Quality Check
+                self.order_table.update_pass_quality_control(work_order_id, new_value)
+
+            print(self.order_table.get_all_orders())
 
     def update_order_status(self, work_order_id, new_status):
         # Update the status in the database
