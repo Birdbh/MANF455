@@ -3,8 +3,8 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QComboBox, QPushButto
 from data2 import Downtime
 
 class MaintenanceTechnicianWindow(QWidget):
-    def init(self, employee_id, employee_name):
-        super().init()
+    def __init__(self, employee_id, employee_name):
+        super().__init__()
         self.employee_id = employee_id
         self.employee_name = employee_name
         self.downtime = Downtime.DowntimeTable()
@@ -27,7 +27,7 @@ class MaintenanceTechnicianWindow(QWidget):
         layout.addWidget(self.downtime_stack)
 
         self.setLayout(layout)
-        self.update_downtime_display()
+        #self.update_downtime_display()
 
     def display_current_downtime_widget(self):
         widget = QWidget()
@@ -85,7 +85,6 @@ class MaintenanceTechnicianWindow(QWidget):
     def update_downtime_display(self):
         self.update_current_downtime_widget()
         if self.downtime.is_currently_downtime():
-            self.downtime_stack.setCurrentIndex(0)  # Show end downtime widget
+            self.downtime_stack.setCurrentIndex(1)  # Show end downtime widget
         else:
-            print('here')
-            self.downtime_stack.setCurrentIndex(1)  # Show set downtime widget
+            self.downtime_stack.setCurrentIndex(0)  # Show set downtime widget
