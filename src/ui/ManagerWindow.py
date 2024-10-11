@@ -1,46 +1,41 @@
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QPushButton, 
-                             QTableWidget, QTableWidgetItem, QFileDialog)
+from PyQt5.QtWidgets import (QLabel, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog)
 import pandas as pd
 import pyqtgraph as pg
 from data2 import Employee
 
-class ManagerWindow(QWidget):
+from ui.UserWindow import UserWindow
+
+class ManagerWindow(UserWindow):
     def __init__(self, employee_id, employee_name):
-        super().__init__()
-        self.employee_id = employee_id
-        self.employee_name = employee_name
+        super().__init__(employee_id, employee_name)
         self.employee_table = Employee.EmployeeTable()
+        self._setup_manager_ui()
 
-        self._init_ui()
+    def _setup_manager_ui(self):
+        self._add_buttons()
+        self._setup_employee_table()
+        self._setup_oee_chart()
 
-    def _init_ui(self):
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(f"Manager: {self.employee_name} (ID: {self.employee_id})"))
-
-        self._add_buttons(layout)
-        self._setup_employee_table(layout)
-        self._setup_oee_chart(layout)
-
-    def _add_buttons(self, layout):
+    def _add_buttons(self):
         for button_text in ["Generate Reports", "Manage Users"]:
             button = QPushButton(button_text)
             button.clicked.connect(lambda checked, text=button_text: self._handle_button_click(text))
-            layout.addWidget(button)
+            self.content_layout.addWidget(button)
 
     def _handle_button_click(self, button_text):
         # Placeholder for button click handlers
         print(f"Button clicked: {button_text}")
 
-    def _setup_employee_table(self, layout):
+    def _setup_employee_table(self):
         self.table = QTableWidget()
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(["Employee ID", "Employee Name", "Position"])
         self._populate_employee_table()
-        layout.addWidget(self.table)
+        self.content_layout.addWidget(self.table)
 
         export_button = QPushButton("Export to CSV")
         export_button.clicked.connect(self._export_to_csv)
-        layout.addWidget(export_button)
+        self.content_layout.addWidget(export_button)
 
     def _populate_employee_table(self):
         employees = self.employee_table.get_employee_details()
@@ -63,9 +58,9 @@ class ManagerWindow(QWidget):
             df = pd.DataFrame(data, columns=["Employee ID", "Employee Name", "Position"])
             df.to_csv(file_name, index=False)
 
-    def _setup_oee_chart(self, layout):
+    def _setup_oee_chart(self):
         self.plot_graph = pg.PlotWidget()
-        layout.addWidget(self.plot_graph)
+        self.content_layout.addWidget(self.plot_graph)
         self._update_oee_chart()
 
     def _update_oee_chart(self):

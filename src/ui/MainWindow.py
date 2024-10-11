@@ -34,14 +34,7 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-        # Create our templates and add them to the stacked widget
-        self.sign_in_template = SignInWindow.SignInWindow()
-
-        # Set the initial template to the sign-in template
-        self.setCentralWidget(self.sign_in_template)
-
-        # Connect the sign-in button to the authenticate method
-        self.sign_in_template.sign_in_button.clicked.connect(self.authenticate)
+        self.initialize_set_and_activate_sign_in_window()
 
     def authenticate(self):
         username = self.sign_in_template.username_input.text()
@@ -65,3 +58,8 @@ class MainWindow(QMainWindow):
             self.setCentralWidget(MaintenanceTechnicianWindow.MaintenanceTechnicianWindow(employee_id, employee_name))
         elif role == "Manager":
             self.setCentralWidget(ManagerWindow.ManagerWindow(employee_id, employee_name))
+
+    def initialize_set_and_activate_sign_in_window(self):
+        self.sign_in_template = SignInWindow.SignInWindow()
+        self.setCentralWidget(self.sign_in_template)
+        self.sign_in_template.sign_in_button.clicked.connect(self.authenticate)
