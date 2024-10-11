@@ -33,8 +33,8 @@ class EmployeeTable:
     def get_all_operators(self):
         return self.connection.execute('SELECT * FROM employee WHERE role = "Operator"').fetchall()
     
-    def validate_user(self, username, password):
-        query_results = self.connection.execute('SELECT * FROM employee WHERE username = ? AND password = ?', (username, password)).fetchone()
-        if query_results is not None:
-            #return the role of the user
-            return query_results[4]
+    def get_employee_details(self, username, password):
+        return self.connection.execute(
+            'SELECT employeeId, name, role FROM employee WHERE username = ? AND password = ?',
+            (username, password)
+        ).fetchone()

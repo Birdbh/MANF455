@@ -4,10 +4,13 @@ from PyQt5.QtWidgets import (QApplication, QWidget, QVBoxLayout, QLabel, QLineEd
 from data2 import Order
 
 class OperatorWindow(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        layout = QVBoxLayout(self)
+    def __init__(self, employee_id, employee_name):
+        super().__init__()
+        self.employee_id = employee_id
+        self.employee_name = employee_name
 
+        layout = QVBoxLayout()
+        layout.addWidget(QLabel(f"Operator: {self.employee_name} (ID: {self.employee_id})"))
         layout.addWidget(QLabel("Operator"))
         self.setup_work_order_table()
         layout.addWidget(self.table)

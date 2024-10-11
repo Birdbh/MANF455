@@ -3,12 +3,14 @@ import pandas as pd
 import pyqtgraph as pg
 
 class ManagerWindow(QWidget):
-    def __init__(self):
+    def __init__(self, employee_id, employee_name):
         super().__init__()
+        self.employee_id = employee_id
+        self.employee_name = employee_name
 
         # Main layout
         layout = QVBoxLayout()
-        layout.addWidget(QLabel("Manager"))
+        layout.addWidget(QLabel(f"Manager: {self.employee_name} (ID: {self.employee_id})"))
 
         # Buttons
         layout.addWidget(QPushButton("Generate Reports"))

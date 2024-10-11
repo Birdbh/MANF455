@@ -34,25 +34,11 @@ class MainWindow(QMainWindow):
         central_widget.setLayout(main_layout)
         self.setCentralWidget(central_widget)
 
-        # Create a stacked widget to hold our templates
-        self.stacked_widget = QStackedWidget()
-        main_layout.addWidget(self.stacked_widget)
-
         # Create our templates and add them to the stacked widget
         self.sign_in_template = SignInWindow.SignInWindow()
-        self.stacked_widget.addWidget(self.sign_in_template)
-
-        self.operator_template = OperatorWindow.OperatorWindow()
-        self.stacked_widget.addWidget(self.operator_template)
-
-        self.technician_template = MaintnanceTechnicianWindow.MaintnanceTechnicianWindow()
-        self.stacked_widget.addWidget(self.technician_template)
-        
-        self.manager_template = ManagerWindow.ManagerWindow()
-        self.stacked_widget.addWidget(self.manager_template)
 
         # Set the initial template to the sign-in template
-        self.stacked_widget.setCurrentWidget(self.sign_in_template)
+        self.setCentralWidget(self.sign_in_template)
 
         # Connect the sign-in button to the authenticate method
         self.sign_in_template.sign_in_button.clicked.connect(self.authenticate)
@@ -63,17 +49,19 @@ class MainWindow(QMainWindow):
         
         emp = Employee.EmployeeTable()
 
-        authentication_role = emp.validate_user(username, password)
-        if authentication_role is not None:
-            self.show_template(authentication_role)
-            print(authentication_role)
+        # Get employee details
+        employee = emp.get_employee_details(username, password)
+
+        if employee is not None:
+            employee_id, employee_name, role = employee[0], employee[1], employee[2]
+            self.show_template(role, employee_id, employee_name)
         else:
             QMessageBox.warning(self, "Login Failed", "Invalid username or password")
 
-    def show_template(self, user_type):
-        if user_type == "Operator":
-            self.stacked_widget.setCurrentWidget(self.operator_template)
-        elif user_type == "Technician":
-            self.stacked_widget.setCurrentWidget(self.technician_template)
-        elif user_type == "Manager":
-            self.stacked_widget.setCurrentWidget(self.manager_template)
+    def show_template(self, role, employee_id, employee_name):
+        if role == "Operator":
+            self.setCentralWidget(OperatorWindow.OperatorWindow(employee_id, employee_name))
+        elif role == "Technician":
+            self.setCentralWidget(MaintnanceTechnicianWindow.MaintnanceTechnicianWindow(employee_id, employee_name))
+        elif role == "Manager":
+            self.setCentralWidget(ManagerWindow.ManagerWindow(employee_id, employee_name))
