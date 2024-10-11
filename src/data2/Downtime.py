@@ -15,14 +15,24 @@ class DowntimeTable:
                 'downtimeId INTEGER PRIMARY KEY AUTOINCREMENT,'
                 'employeeId INTEGER NOT NULL,'
                 'downtimeReason Text NOT NULL,'
-                'status TEXT NOT NULL CHECK (status IN ("Machine Fault", "Product Malfunction", "Labour Incident"))'
+                'reason TEXT NOT NULL CHECK (status IN ("Machine Fault", "Product Malfunction", "Labour Incident")),'
+                'status TEXT NOT NULL CHECK (status IN ("Pending", "Resolved")),'
                 ')'
             )
             self.connection.commit()
 
-    def add_downtime(self, employeeId: int, downtimeReason: str, status: str):
+    def add_downtime(self, employeeId: int, downtimeReason: str, reason: str):
         self.connection.execute(
-            'INSERT INTO downtime (employeeId, downtimeReason, status) VALUES (?, ?, ?)',
-            (employeeId, downtimeReason, status)
+            'INSERT INTO downtime (employeeId, downtimeReason, reason, status) VALUES (?, ?, ?, ?)',
+            (employeeId, downtimeReason, reason, 'Pending')
         )
         self.connection.commit()
+
+    def get_last_row(self):
+        return self.connection.execute('SELECT * FROM downtime ORDER BY downtimeId DESC LIMIT 1').fetchone()
+
+    def get_last_row_status(self):
+        return self.connection.execute('SELECT status FROM downtime ORDER BY downtimeId DESC LIMIT 1').fetchone()[0]
+    
+    def last_row_resolved(self):
+        return self.get_last_row_status == 'Resolved'
