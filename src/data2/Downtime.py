@@ -29,9 +29,6 @@ class DowntimeTable:
 
     def get_last_row(self):
         return self.connection.execute('SELECT * FROM downtime ORDER BY downtimeId DESC LIMIT 1').fetchone()
-
-    def get_last_row_status(self):
-        return self.connection.execute('SELECT status FROM downtime ORDER BY downtimeId DESC LIMIT 1').fetchone()[0]
     
     def is_currently_downtime(self):
         return self.get_last_row_status() == 'Pending'
