@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QComboBox, 
                              QPushButton, QStackedWidget)
-from data2 import Downtime
+from data import Downtime
 from .UserWindow import UserWindow
 
 class MaintenanceTechnicianWindow(UserWindow):

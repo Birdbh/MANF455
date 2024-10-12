@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QLabel, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog)
 import pandas as pd
 import pyqtgraph as pg
-from data2 import Employee
+from data import Employee
 
 from ui.UserWindow import UserWindow
 

@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QLineEdit,
                              QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView)
 from PyQt5.QtCore import Qt
-from data2 import Order
+from data import Order
 
 from ui.UserWindow import UserWindow
 

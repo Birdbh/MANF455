@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, QLabel, QStackedWidget, QLineEdit, QMessageBox
 
-from data2 import Employee
+from data import Employee
 from ui import OperatorWindow
 from ui import ManagerWindow
 from ui import MaintenanceTechnicianWindow

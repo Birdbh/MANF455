@@ -1,5 +1,5 @@
 import sqlite3
-from data2 import DatabaseConnector
+from data import DatabaseConnector
 from datetime import datetime
 
 class DowntimeTable:
