@@ -1,29 +1,28 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QComboBox, 
                              QPushButton, QStackedWidget)
 from data2 import Downtime
+from .UserWindow import UserWindow
 
-class MaintenanceTechnicianWindow(QWidget):
+class MaintenanceTechnicianWindow(UserWindow):
     def __init__(self, employee_id, employee_name):
-        super().__init__()
-        self.employee_id = employee_id
-        self.employee_name = employee_name
+        super().__init__(employee_id, employee_name)
         self.downtime = Downtime.DowntimeTable()
+        self._setup_ui()
 
-        self._init_ui()
+    def _setup_ui(self):
+        self._add_downtime_display()
+        self._add_downtime_forms()
         self.update_downtime_display()
 
-    def _init_ui(self):
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(f"Technician: {self.employee_name} (ID: {self.employee_id})"))
-        layout.addWidget(QPushButton("Create Maintenance Report"))
-
-        self.current_downtime_label = QLabel()
-        layout.addWidget(self._create_widget("Current Downtime", self.current_downtime_label))
-
+    def _add_downtime_forms(self):
         self.downtime_stack = QStackedWidget()
         self.downtime_stack.addWidget(self._create_set_downtime_widget())
         self.downtime_stack.addWidget(self._create_end_downtime_widget())
-        layout.addWidget(self.downtime_stack)
+        self.content_layout.addWidget(self.downtime_stack)
+
+    def _add_downtime_display(self):
+        self.current_downtime_label = QLabel()
+        self.content_layout.addWidget(self._create_widget("Current Downtime", self.current_downtime_label))
 
     def _create_widget(self, title, *widgets):
         widget = QWidget()

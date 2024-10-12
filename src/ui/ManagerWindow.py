@@ -9,9 +9,9 @@ class ManagerWindow(UserWindow):
     def __init__(self, employee_id, employee_name):
         super().__init__(employee_id, employee_name)
         self.employee_table = Employee.EmployeeTable()
-        self._setup_manager_ui()
+        self._setup_ui()
 
-    def _setup_manager_ui(self):
+    def _setup_ui(self):
         self._add_buttons()
         self._setup_employee_table()
         self._setup_oee_chart()

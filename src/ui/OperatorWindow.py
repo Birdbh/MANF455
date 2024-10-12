@@ -3,24 +3,18 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QLineEdit,
 from PyQt5.QtCore import Qt
 from data2 import Order
 
-class OperatorWindow(QWidget):
+from ui.UserWindow import UserWindow
+
+class OperatorWindow(UserWindow):
     def __init__(self, employee_id, employee_name):
-        super().__init__()
-        self.employee_id = employee_id
-        self.employee_name = employee_name
+        super().__init__(employee_id, employee_name)
         self.order_table = Order.OrderTable()
         self.editable_columns = [2, 3, 5]  # Drilling Operation, Start Time, and Pass Quality Control are editable
+        self._setup_ui()
 
-        self._init_ui()
-
-    def _init_ui(self):
-        layout = QVBoxLayout(self)
-        layout.addWidget(QLabel(f"Operator: {self.employee_name} (ID: {self.employee_id})"))
-        
+    def _setup_ui(self):
+        self._create_work_order_widget()
         self._setup_work_order_table()
-        layout.addWidget(self.table)
-        
-        layout.addWidget(self._create_work_order_widget())
 
     def _setup_work_order_table(self):
         self.table = QTableWidget(0, 6)
@@ -28,6 +22,7 @@ class OperatorWindow(QWidget):
         self.table.setHorizontalHeaderLabels(["Work Order ID", "Customer ID", "Drilling Operation", "Start Time", "Status", "Pass Quality Control"])
         self.table.itemChanged.connect(self._handle_item_changed)
         self._populate_work_order_table()
+        self.content_layout.addWidget(self.table)
 
     def _populate_work_order_table(self):
         work_orders = self.order_table.get_all_orders()
@@ -63,7 +58,7 @@ class OperatorWindow(QWidget):
         submit_button.clicked.connect(self._submit_work_order)
         layout.addWidget(submit_button)
 
-        return widget
+        self.content_layout.addWidget(widget)
 
     def _submit_work_order(self):
         customer_id = int(self.customer_id.text())
