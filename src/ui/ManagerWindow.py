@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import (QLabel, QPushButton, QTableWidget, QTableWidgetItem
 import pandas as pd
 import pyqtgraph as pg
 from data import Employee
+import pypdf
 
 from ui.UserWindow import UserWindow
 
@@ -12,19 +13,27 @@ class ManagerWindow(UserWindow):
         self._setup_ui()
 
     def _setup_ui(self):
-        self._add_buttons()
+        self._add_button()
         self._setup_employee_table()
         self._setup_oee_chart()
 
-    def _add_buttons(self):
-        for button_text in ["Generate Reports", "Manage Users"]:
-            button = QPushButton(button_text)
-            button.clicked.connect(lambda checked, text=button_text: self._handle_button_click(text))
-            self.content_layout.addWidget(button)
+    def _add_button(self):
+        button = QPushButton("Generate Report")
+        button.clicked.connect(self._handle_button_click)
+        self.content_layout.addWidget(button)
 
-    def _handle_button_click(self, button_text):
-        # Placeholder for button click handlers
-        print(f"Button clicked: {button_text}")
+    def _handle_button_click(self):
+        options = QFileDialog.Options()
+        file_name, _ = QFileDialog.getSaveFileName(self, "Save PDF Report", "", "PDF Files (*.pdf)", options=options)
+        if file_name:
+            self._generate_empty_pdf(file_name)
+
+    def _generate_empty_pdf(self, file_name):
+        pdf_writer = pypdf.PdfWriter()
+        pdf_writer.add_blank_page(width=612, height=792)  # Standard letter size
+        
+        with open(file_name, 'wb') as file:
+            pdf_writer.write(file)
 
     def _setup_employee_table(self):
         self.table = QTableWidget()
