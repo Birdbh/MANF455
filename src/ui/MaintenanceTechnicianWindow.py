@@ -56,9 +56,10 @@ class MaintenanceTechnicianWindow(UserWindow):
 
     def update_downtime_display(self):
         if self.downtime.is_currently_downtime():
+            last_downtime = self.downtime.get_last_row()
             self.current_downtime_label.setText(
-                f"Reason: {self.downtime.get_last_row_reason()}\n"
-                f"Status: {self.downtime.get_last_row_status()}"
+                f"Reason: {last_downtime.downtimeReason}\n"
+                f"Status: {last_downtime.status}"
             )
             self.downtime_stack.setCurrentIndex(1)  # Show end downtime widget
         else:

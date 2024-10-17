@@ -25,15 +25,24 @@ class OperatorWindow(UserWindow):
         self.content_layout.addWidget(self.table)
 
     def _populate_work_order_table(self):
+        self.table.clear()
+        self.table.setRowCount(0)
         work_orders = self.order_table.get_all_orders()
         for work_order in work_orders:
             self._add_work_order_to_table(work_order)
 
     def _add_work_order_to_table(self, work_order):
-        #TODO: This is bad, the table should update from changes in the database, right now inserting manually is bad
         row_idx = self.table.rowCount()
         self.table.insertRow(row_idx)
-        for col_idx, item in enumerate(work_order):
+        items = [
+            work_order.orderId,
+            work_order.customer_id,
+            work_order.drilling_operation,
+            work_order.order_date.strftime('%Y-%m-%d %H:%M:%S'),
+            work_order.status,
+            str(work_order.passQualityControl)
+        ]
+        for col_idx, item in enumerate(items):
             table_item = QTableWidgetItem(str(item))
             if col_idx not in self.editable_columns:
                 table_item.setFlags(table_item.flags() & ~Qt.ItemIsEditable)
@@ -70,7 +79,7 @@ class OperatorWindow(UserWindow):
         new_order_id = self.order_table.get_last_row_id()
 
         new_work_order = (new_order_id, customer_id, drilling_operation, start_time, "pending", True)
-        self._add_work_order_to_table(new_work_order)
+        self._populate_work_order_table()
 
         # Clear input fields after submission
         self.customer_id.clear()
@@ -89,9 +98,7 @@ class OperatorWindow(UserWindow):
             elif column == 3:  # Start Time
                 self.order_table.update_start_time(work_order_id, new_value)
             elif column == 5: # Quality Check
-                self.order_table.update_pass_quality_control(work_order_id, new_value)
-
-            print(self.order_table.get_all_orders())
+                self.order_table.update_pass_quality_control(work_order_id, new_value.lower() == 'true')
 
     def update_order_status(self, work_order_id, new_status):
         # Update the status in the database

@@ -50,10 +50,10 @@ class ManagerWindow(UserWindow):
         employees = self.employee_table.get_employee_details()
         
         self.table.setRowCount(len(employees))
-        for row_idx, (emp_id, name, role) in enumerate(employees):
-            self.table.setItem(row_idx, 0, QTableWidgetItem(str(emp_id)))
-            self.table.setItem(row_idx, 1, QTableWidgetItem(name))
-            self.table.setItem(row_idx, 2, QTableWidgetItem(role))
+        for row_idx, employee in enumerate(employees):
+            self.table.setItem(row_idx, 0, QTableWidgetItem(str(employee.employeeId)))
+            self.table.setItem(row_idx, 1, QTableWidgetItem(employee.name))
+            self.table.setItem(row_idx, 2, QTableWidgetItem(employee.role))
 
     def _export_to_csv(self):
         options = QFileDialog.Options()

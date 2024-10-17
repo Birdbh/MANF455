@@ -1,52 +1,83 @@
-import sqlite3
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 from data import DatabaseConnector
 from datetime import datetime
 
+Base = declarative_base()
+
+class Order(Base):
+    __tablename__ = 'orders'
+
+    orderId = Column(Integer, primary_key=True, autoincrement=True)
+    customer_id = Column(Integer, nullable=False)
+    drilling_operation = Column(Integer, nullable=False)
+    order_date = Column(DateTime, nullable=False)
+    status = Column(String, nullable=False)
+    passQualityControl = Column(Boolean, nullable=False)
+
 class OrderTable:
     def __init__(self):
-        self.connection = DatabaseConnector.Database.get_connection()
+        self.engine = create_engine("sqlite:///MESDATABASE")
+        self.Session = sessionmaker(bind=self.engine)
         self.create_table()
 
     def create_table(self):
-        #check if a table called orders is in the database
-        if self.connection.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='orders';").fetchone() is None:
-            self.connection.execute(
-                'CREATE TABLE orders ('
-                'orderId INTEGER PRIMARY KEY AUTOINCREMENT,'
-                'customer_id INTEGER NOT NULL,'
-                'drilling_operation INTEGER NOT NULL,'
-                'order_date TEXT NOT NULL,'
-                'status TEXT NOT NULL,'
-                'passQualityControl BOOLEAN NOT NULL'
-                ')'
-            )
-            self.connection.commit()
+        Base.metadata.create_all(self.engine)
 
     def add_order(self, customer_id: int, drilling_operation: int, order_date: str, status: str, passQualityControl: bool):
-        self.connection.execute(
-            'INSERT INTO orders (customer_id, drilling_operation, order_date, status, passQualityControl) VALUES (?, ?, ?, ?, ?)',
-            (customer_id, drilling_operation, order_date, status, passQualityControl)
+        session = self.Session()
+        new_order = Order(
+            customer_id=customer_id,
+            drilling_operation=drilling_operation,
+            order_date=datetime.strptime(order_date, '%Y-%m-%d %H:%M:%S'),
+            status=status,
+            passQualityControl=passQualityControl
         )
-        self.connection.commit()
+        session.add(new_order)
+        session.commit()
+        session.close()
 
     def get_all_orders(self):
-        return self.connection.execute('SELECT * FROM orders').fetchall()
-    
+        session = self.Session()
+        orders = session.query(Order).all()
+        session.close()
+        return orders
+
     def get_last_row_id(self):
-        return self.connection.execute('SELECT orderId FROM orders ORDER BY orderId DESC LIMIT 1').fetchone()[0]
-    
+        session = self.Session()
+        last_order = session.query(Order).order_by(Order.orderId.desc()).first()
+        session.close()
+        return last_order.orderId if last_order else None
+
     def update_drilling_operation(self, order_id: int, new_drilling_operation: int):
-        self.connection.execute('UPDATE orders SET drilling_operation = ? WHERE orderId = ?', (new_drilling_operation, order_id))
-        self.connection.commit()
+        session = self.Session()
+        order = session.query(Order).filter_by(orderId=order_id).first()
+        if order:
+            order.drilling_operation = new_drilling_operation
+            session.commit()
+        session.close()
 
     def update_start_time(self, order_id: int, new_start_time: str):
-        self.connection.execute('UPDATE orders SET order_date = ? WHERE orderId = ?', (new_start_time, order_id))
-        self.connection.commit()
+        session = self.Session()
+        order = session.query(Order).filter_by(orderId=order_id).first()
+        if order:
+            order.order_date = datetime.strptime(new_start_time, '%Y-%m-%d %H:%M:%S')
+            session.commit()
+        session.close()
 
     def update_status(self, order_id: int, new_status: str):
-        self.connection.execute('UPDATE orders SET status = ? WHERE orderId = ?', (new_status, order_id))
-        self.connection.commit()
-    
+        session = self.Session()
+        order = session.query(Order).filter_by(orderId=order_id).first()
+        if order:
+            order.status = new_status
+            session.commit()
+        session.close()
+
     def update_pass_quality_control(self, order_id: int, new_pass_quality_control: bool):
-        self.connection.execute('UPDATE orders SET passQualityControl = ? WHERE orderId = ?', (new_pass_quality_control, order_id))
-        self.connection.commit()
+        session = self.Session()
+        order = session.query(Order).filter_by(orderId=order_id).first()
+        if order:
+            order.passQualityControl = new_pass_quality_control
+            session.commit()
+        session.close()
