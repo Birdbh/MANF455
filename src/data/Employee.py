@@ -1,5 +1,6 @@
 import sqlite3
 from data import DatabaseConnector
+import sqlalchemy
 
 class EmployeeTable:
     def __init__(self):
@@ -7,6 +8,7 @@ class EmployeeTable:
         self.create_table()
 
     def create_table(self):
+        
         #check if a table called orders is in the database
         if self.connection.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='employee';").fetchone() is None:
             self.connection.execute(

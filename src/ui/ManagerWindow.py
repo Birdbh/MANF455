@@ -78,7 +78,7 @@ class ManagerWindow(UserWindow):
         self.plot_graph.plot(time, temperature)
 
     def _get_oee_data(self):
-        # TODO: Replace with actual OEE data from database
+        # TODO: Replace with actual OEE data from database this is in the OEECalculator class but there are a number of TODOs currently in the OEECalculator still
         time = list(range(1, 11))
         temperature = [30, 32, 34, 32, 33, 31, 29, 32, 35, 30]
         return time, temperature

@@ -1,11 +1,15 @@
 from opcua import Client
+from ComsManager import ComsManager
 
 URL = "opc.tcp://127.0.0.1:12345"
-NODE_ADDRESS_LIST = ['ns=2;s="TS1_Temperature"']
+NODE_ADDRESS_DICT = {'ns=2;s="TS1_Temperature"':'Downtime'}
 
 class SubHandler(object):
     def datachange_notification(self, node, val, data):
-        print("New data change event at NodeID", node, ". New value = ", val)
+        com_type = NODE_ADDRESS_DICT[node]
+        nodeId = node
+        new_value = val
+        ComsManager().direct_communication(com_type, nodeId, new_value)
 
 class Client():
 
@@ -23,7 +27,7 @@ class Client():
 
     def get_nodes(self):
         self.node_array = []
-        for node in NODE_ADDRESS_LIST:
+        for node in NODE_ADDRESS_DICT.keys():
             self.node_array.append(self.client.get_node(node))
             self.subscribe_node(node)
 

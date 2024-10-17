@@ -1,6 +1,7 @@
 import sqlite3
 from data import DatabaseConnector
 from datetime import datetime
+import sqlalchemy
 
 class DowntimeTable:
     def __init__(self):

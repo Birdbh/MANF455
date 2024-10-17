@@ -30,6 +30,7 @@ class OperatorWindow(UserWindow):
             self._add_work_order_to_table(work_order)
 
     def _add_work_order_to_table(self, work_order):
+        #TODO: This is bad, the table should update from changes in the database, right now inserting manually is bad
         row_idx = self.table.rowCount()
         self.table.insertRow(row_idx)
         for col_idx, item in enumerate(work_order):
