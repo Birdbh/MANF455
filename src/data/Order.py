@@ -6,6 +6,8 @@ from datetime import datetime
 
 Base = declarative_base()
 
+#TODO: need to add a foreign key constraint for customer_id
+
 class Order(Base):
     __tablename__ = 'orders'
 
@@ -81,3 +83,22 @@ class OrderTable:
             order.passQualityControl = new_pass_quality_control
             session.commit()
         session.close()
+
+    def get_total_parts_produced_today(self):
+        session = self.Session()
+        total_parts_produced = session.query(Order).filter(
+            Order.order_date >= datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+            Order.status == "Completed",
+        ).count()
+        session.close()
+        return total_parts_produced
+    
+    def get_total_good_parts_produced_today(self):
+        session = self.Session()
+        total_good_parts_produced = session.query(Order).filter(
+            Order.order_date >= datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+            Order.status == "Completed",
+            Order.passQualityControl == True
+        ).count()
+        session.close()
+        return total_good_parts_produced

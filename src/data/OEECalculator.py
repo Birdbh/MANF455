@@ -1,3 +1,5 @@
+from data.Order import Order
+from data.Downtime import Downtime
 
 TOTAL_RUN_TIME_HOURS_IN_ONE_DAY = 8
 PARTS_PRODUCED_PER_HOUR = 40
@@ -18,7 +20,11 @@ class OEECalculator:
     
     def total_down_time(self):
         #TODO: querty the downtime database to get the sum of all the downtime for the current day
-        pass
+        downtime_db = Downtime()
+        total_downtime = downtime_db.get_total_downtime_today()
+        #convert the total_downtime to hours
+        total_downtime = total_downtime.total_seconds() / 3600
+        return total_downtime
     
     def calculate_performance(self):
         actual_part_producted = self.total_part_produced()
@@ -31,7 +37,9 @@ class OEECalculator:
     
     def total_part_produced(self):
         #TODO: querty the Order database to get the sum of all the parts produced for the current day
-        pass
+        order_db = Order()
+        total_parts_produced = order_db.get_total_parts_produced_today()
+        return total_parts_produced
     
     def calculate_quality(self):
         good_parts_produced = self.total_good_parts_produced()
@@ -41,4 +49,6 @@ class OEECalculator:
     
     def total_good_parts_produced (self):
         #TODO: querty the Order database to get the sum of all the good parts produced for the current day
-        pass
+        order_db = Order()
+        total_good_parts_produced = order_db.get_total_good_parts_produced_today()
+        return total_good_parts_produced
