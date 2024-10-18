@@ -19,7 +19,6 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.init_ui()
 
-
     def init_ui(self):
         #Create a main window
         self.setWindowTitle('Manufacturing Execution System')
