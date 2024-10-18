@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QLineEdit,
                              QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView)
 from PyQt5.QtCore import Qt
 from data import Order
+import datetime
 
 from ui.UserWindow import UserWindow
 
@@ -57,6 +58,9 @@ class OperatorWindow(UserWindow):
         self.drilling_operation = QComboBox()
         self.drilling_operation.addItems(["1", "2", "3"])
         self.start_time = QDateTimeEdit()
+        self.start_time.setMinimumDateTime(datetime.datetime.now())
+        self.start_time.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.start_time.setDateTime(datetime.datetime.now())
 
         for label, w in [("Customer ID", self.customer_id),
                          ("Drilling Operation", self.drilling_operation),
@@ -75,7 +79,7 @@ class OperatorWindow(UserWindow):
         drilling_operation = int(self.drilling_operation.currentText())
         start_time = self.start_time.dateTime().toString("yyyy-MM-dd hh:mm:ss")
 
-        self.order_table.add_order(customer_id, drilling_operation, start_time, "pending", True)
+        self.order_table.add_order(customer_id, drilling_operation, start_time, "Pending", True)
 
         self._populate_work_order_table()
 
