@@ -65,10 +65,13 @@ class DowntimeTable:
             session.commit()
         session.close()
 
-    def get_total_downtime_today(self):
+    def get_total_downtime_for_date(self, date):
         session = self.Session()
-        current_date = datetime.datetime.now().date()
-        downtimes = session.query(Downtime).filter(Downtime.downtimeEnd >= current_date).all()
+        date_next_day = date + datetime.timedelta(days=1)
+        downtimes = session.query(Downtime).filter(
+            Downtime.downtimeStart >= date,
+            Downtime.downtimeEnd <= date_next_day
+            ).all()
         total_downtime = sum([downtime.downtimeDelta.total_seconds() for downtime in downtimes], datetime.timedelta())
         session.close()
         return total_downtime

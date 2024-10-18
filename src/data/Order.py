@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from data import DatabaseConnector
-from datetime import datetime
+import datetime
 
 Base = declarative_base()
 
@@ -84,19 +84,23 @@ class OrderTable:
             session.commit()
         session.close()
 
-    def get_total_parts_produced_today(self):
+    def get_total_parts_produced_for_date(self, date):
         session = self.Session()
+        date_next_day = date + datetime.timedelta(days=1)
         total_parts_produced = session.query(Order).filter(
-            Order.order_date >= datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+            Order.order_date >= date,
+            Order.order_date <= date_next_day,
             Order.status == "Completed",
         ).count()
         session.close()
         return total_parts_produced
     
-    def get_total_good_parts_produced_today(self):
+    def get_total_good_parts_produced_today(self, date):
         session = self.Session()
+        date_next_day = date + datetime.timedelta(days=1)
         total_good_parts_produced = session.query(Order).filter(
-            Order.order_date >= datetime.now().replace(hour=0, minute=0, second=0, microsecond=0),
+            Order.order_date >= date,
+            Order.order_date <= date_next_day,
             Order.status == "Completed",
             Order.passQualityControl == True
         ).count()

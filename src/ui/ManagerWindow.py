@@ -3,7 +3,7 @@ import pandas as pd
 import pyqtgraph as pg
 from data import Employee
 import pypdf
-
+from datetime import datetime
 from ui.UserWindow import UserWindow
 from data.OEECalculator import OEECalculator
 
@@ -74,13 +74,11 @@ class ManagerWindow(UserWindow):
         self._update_oee_chart()
 
     def _update_oee_chart(self):
+        #TODO: need to find a way to plot the datetime objects on the x-axis of the chart
         time, temperature = self._get_oee_data()
         self.plot_graph.clear()
         self.plot_graph.plot(time, temperature)
 
     def _get_oee_data(self):
-        # TODO: Replace with actual OEE data from database this is in the OEECalculator class but there are a number of TODOs currently in the OEECalculator still
-        time = list(range(1, 11))
-        b = OEECalculator()
-        temperature = [b.calculate_oee(), 32, 34, 32, 33, 31, 29, 32, 35, 30]
-        return time, temperature
+        oee = OEECalculator()
+        return oee.get_past_week_of_oee()
