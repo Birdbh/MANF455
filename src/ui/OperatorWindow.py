@@ -25,7 +25,7 @@ class OperatorWindow(UserWindow):
         self.content_layout.addWidget(self.table)
 
     def _populate_work_order_table(self):
-        self.table.clear()
+        self.table.clearContents()
         self.table.setRowCount(0)
         work_orders = self.order_table.get_all_orders()
         for work_order in work_orders:
@@ -76,9 +76,7 @@ class OperatorWindow(UserWindow):
         start_time = self.start_time.dateTime().toString("yyyy-MM-dd hh:mm:ss")
 
         self.order_table.add_order(customer_id, drilling_operation, start_time, "pending", True)
-        new_order_id = self.order_table.get_last_row_id()
 
-        new_work_order = (new_order_id, customer_id, drilling_operation, start_time, "pending", True)
         self._populate_work_order_table()
 
         # Clear input fields after submission
