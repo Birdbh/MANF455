@@ -10,7 +10,6 @@ class OEECalculator:
         dates_from_past_week = pd.date_range(end=pd.Timestamp.today(), periods=7).date
         oee_from_past_week = []
 
-        print(dates_from_past_week)
         for date in dates_from_past_week:
             oee = self.calculate_oee(date)
             oee_from_past_week.append(oee)

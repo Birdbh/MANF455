@@ -69,15 +69,17 @@ class ManagerWindow(UserWindow):
             df.to_csv(file_name, index=False)
 
     def _setup_oee_chart(self):
-        self.plot_graph = pg.PlotWidget()
+        self.plot_graph = pg.PlotWidget(axisItems={'bottom': pg.DateAxisItem()})
         self.content_layout.addWidget(self.plot_graph)
         self._update_oee_chart()
 
     def _update_oee_chart(self):
         #TODO: need to find a way to plot the datetime objects on the x-axis of the chart
-        time, temperature = self._get_oee_data()
+        time, oee_values = self._get_oee_data()
+        #convert the time datetime objects to timestamps
+        time = [datetime.combine(t, datetime.min.time()).timestamp() for t in time]
         self.plot_graph.clear()
-        self.plot_graph.plot(time, temperature)
+        self.plot_graph.plot(time, oee_values)
 
     def _get_oee_data(self):
         oee = OEECalculator()
