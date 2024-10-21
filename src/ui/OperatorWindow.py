@@ -101,13 +101,3 @@ class OperatorWindow(UserWindow):
                 self.order_table.update_start_time(work_order_id, new_value)
             elif column == 5: # Quality Check
                 self.order_table.update_pass_quality_control(work_order_id, new_value.lower() == 'true')
-
-    def update_order_status(self, work_order_id, new_status):
-        # Update the status in the database
-        self.order_table.update_status(work_order_id, new_status)
-
-        # Update the status in the table
-        for row in range(self.table.rowCount()):
-            if int(self.table.item(row, 0).text()) == work_order_id:
-                self.table.item(row, 4).setText(new_status)
-                break

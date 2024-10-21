@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from data import DatabaseConnector
 import datetime
 
 Base = declarative_base()
@@ -32,7 +31,7 @@ class OrderTable:
         new_order = Order(
             customer_id=customer_id,
             drilling_operation=drilling_operation,
-            order_date=datetime.strptime(order_date, '%Y-%m-%d %H:%M:%S'),
+            order_date=datetime.datetime.strptime(order_date, '%Y-%m-%d %H:%M:%S'),
             status=status,
             passQualityControl=passQualityControl
         )
@@ -64,15 +63,16 @@ class OrderTable:
         session = self.Session()
         order = session.query(Order).filter_by(orderId=order_id).first()
         if order:
-            order.order_date = datetime.strptime(new_start_time, '%Y-%m-%d %H:%M:%S')
+            order.order_date = datetime.datetime.strptime(new_start_time, '%Y-%m-%d %H:%M:%S')
             session.commit()
         session.close()
 
-    def update_status(self, order_id: int, new_status: str):
+    #TODO: This method still needs to be called by the Queue
+    def set_status_completed(self, order_id: int):
         session = self.Session()
         order = session.query(Order).filter_by(orderId=order_id).first()
         if order:
-            order.status = new_status
+            order.status = "Completed"
             session.commit()
         session.close()
 
