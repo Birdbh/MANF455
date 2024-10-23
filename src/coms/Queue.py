@@ -13,3 +13,28 @@
 # - next_order: This property should return the next order in the queue.
 # - queue_length: This property should return the length of the queue.
 # The class should have the following methods:
+
+import datetime
+
+class Queue():
+    def __init__(self):
+        self.queue = []
+        self.queue_length = 0
+
+    def add_order(self, order):
+        self.queue.append(order)
+        self.queue_length += 1
+
+    def get_next_order(self):
+        return self.queue[0] if self.queue else None
+    
+    def remove_order(self):
+        if self.queue:
+            self.queue.pop(0)
+            self.queue_length -= 1
+
+    def get_queue(self):
+        return self.queue
+    
+    def scan_orders_database_for_orders_to_begin_now(self, order_table):
+        pass
