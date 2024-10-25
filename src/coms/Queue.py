@@ -1,40 +1,112 @@
-#TODO: Create a class that will handle the queue of the orders being sent to the drilling machine.
-# This class should have the following methods:
-# - add_order: This method should add a new order to the queue.
-# - get_next_order: This method should return the next order in the queue.
-# - remove_order: This method should remove the next order in the queue.
-# - get_queue: This method should return the entire queue.
-# - clear_queue: This method should remove all the orders in the queue.
-# The class should have the following attributes:
-# - queue: This attribute should be a list that will store the orders in the queue.
-# The class should have the following constructor:
-# - __init__: This method should initialize the queue attribute as an empty list.
-# The class should have the following properties:
-# - next_order: This property should return the next order in the queue.
-# - queue_length: This property should return the length of the queue.
-# The class should have the following methods:
-
+import threading
+import time
 import datetime
+from typing import Optional
+from sqlalchemy import and_
 
-class Queue():
-    def __init__(self):
-        self.queue = []
-        self.queue_length = 0
+class OrderQueue(threading.Thread):
+    def __init__(self, order_table, node_list):
+        """
+        Initialize the OrderQueue thread
+        
+        Args:
+            order_table: Instance of OrderTable for database operations
+            node_list: Instance of NodeList for checking processing status
+        """
+        super().__init__()
+        self.order_table = order_table
+        self.node_list = node_list
+        self.daemon = True  # Thread will exit when main program exits
+        self._stop_event = threading.Event()
+        self.processing_node = next(
+            (node for node in node_list.get_nodes() if node.tag_name == "CurrentProcessing"),
+            None
+        )
 
-    def add_order(self, order):
-        self.queue.append(order)
-        self.queue_length += 1
+    def stop(self):
+        """Signal the thread to stop"""
+        self._stop_event.set()
 
-    def get_next_order(self):
-        return self.queue[0] if self.queue else None
-    
-    def remove_order(self):
-        if self.queue:
-            self.queue.pop(0)
-            self.queue_length -= 1
+    def process_order(self, order) -> None:
+        """
+        Process an order when its start time is reached
+        
+        Args:
+            order: Order object to be processed
+        """
+        # Mark the order as in progress
+        session = self.order_table.Session()
+        try:
+            order.status = "In Progress"
+            session.commit()
+            
+            # Call your processing function here
+            self.start_manufacturing_process(order)
+            
+        finally:
+            session.close()
 
-    def get_queue(self):
-        return self.queue
-    
-    def scan_orders_database_for_orders_to_begin_now(self, order_table):
+    def start_manufacturing_process(self, order) -> None:
+        """
+        Start the manufacturing process for an order
+        
+        Args:
+            order: Order object to be manufactured
+        """
+        # Implement your manufacturing process logic here
+        # This could involve sending signals to your OPC UA client
+        # or triggering other manufacturing systems
         pass
+
+    def run(self):
+        """Main thread loop for monitoring and processing orders"""
+        while not self._stop_event.is_set():
+            current_time = datetime.datetime.now()
+            
+            # Get all unprocessed orders
+            session = self.order_table.Session()
+            try:
+                unprocessed_orders = session.query(Order).filter(
+                    and_(
+                        Order.status != "Completed",
+                        Order.order_date <= current_time
+                    )
+                ).all()
+
+                for order in unprocessed_orders:
+                    if order.status == "Pending":
+                        if order.order_date <= current_time:
+                            # Check if system is currently processing
+                            if self.processing_node and self.processing_node.current_value:
+                                # System is busy, push start time forward
+                                order.order_date = current_time + datetime.timedelta(minutes=1)
+                                session.commit()
+                            else:
+                                # System is available, process the order
+                                self.process_order(order)
+                
+                session.commit()
+            
+            except Exception as e:
+                print(f"Error in OrderQueue: {e}")
+                session.rollback()
+            finally:
+                session.close()
+
+            # Sleep for a short interval before next check
+            time.sleep(1)
+
+def create_order_queue(order_table, node_list) -> OrderQueue:
+    """
+    Create and start an OrderQueue instance
+    
+    Args:
+        order_table: Instance of OrderTable
+        node_list: Instance of NodeList
+    
+    Returns:
+        OrderQueue: Running OrderQueue thread instance
+    """
+    queue = OrderQueue(order_table, node_list)
+    queue.start()
+    return queue
