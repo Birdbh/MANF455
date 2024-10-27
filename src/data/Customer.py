@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Enum, DateTime, I
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-Base = declarative_base()
+from data.DatabaseConnector import Base, engine, Session
 
 class Customer(Base):
     __tablename__ = 'customer'
@@ -14,8 +14,8 @@ class Customer(Base):
 
 class CustomerTable:
     def __init__(self):
-        self.engine = create_engine("sqlite:///MESDATABASE")
-        self.Session = sessionmaker(bind=self.engine)
+        self.engine = engine
+        self.Session = Session
         self.create_table()
 
     def create_table(self):

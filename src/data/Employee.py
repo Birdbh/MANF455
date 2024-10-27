@@ -1,9 +1,8 @@
 from sqlalchemy import create_engine, Column, Integer, String, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from data import DatabaseConnector
 
-Base = declarative_base()
+from data.DatabaseConnector import Base, engine, Session
 
 class Employee(Base):
     __tablename__ = 'employee'
@@ -16,8 +15,8 @@ class Employee(Base):
 
 class EmployeeTable:
     def __init__(self):
-        self.engine = create_engine("sqlite:///MESDATABASE")
-        self.Session = sessionmaker(bind=self.engine)
+        self.engine = engine
+        self.Session = Session
         self.create_table()
 
     def create_table(self):

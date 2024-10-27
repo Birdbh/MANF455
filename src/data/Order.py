@@ -1,17 +1,22 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import datetime
+import sys
+import os
 
-Base = declarative_base()
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
+if project_root not in sys.path:
+    sys.path.append(project_root)
+    
+from data.DatabaseConnector import Base, engine, Session
 
-#TODO: need to add a foreign key constraint for customer_id
 
 class Order(Base):
     __tablename__ = 'orders'
 
     orderId = Column(Integer, primary_key=True, autoincrement=True)
-    customer_id = Column(Integer, nullable=False)
+    customer_id = Column(Integer, ForeignKey('customer.customerid'), nullable=False)
     drilling_operation = Column(Integer, nullable=False)
     order_date = Column(DateTime, nullable=False)
     status = Column(String, nullable=False)
@@ -19,8 +24,8 @@ class Order(Base):
 
 class OrderTable:
     def __init__(self):
-        self.engine = create_engine("sqlite:///MESDATABASE")
-        self.Session = sessionmaker(bind=self.engine)
+        self.engine = engine
+        self.Session = Session
         self.create_table()
 
     def create_table(self):

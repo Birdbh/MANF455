@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QLineEdit,
                              QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView)
 from PyQt5.QtCore import Qt
 from data import Order
+from data import Customer
 import datetime
 
 from ui.UserWindow import UserWindow
@@ -9,6 +10,7 @@ from ui.UserWindow import UserWindow
 class OperatorWindow(UserWindow):
     def __init__(self, employee_id, employee_name):
         super().__init__(employee_id, employee_name)
+        self.customer_table = Customer.CustomerTable()
         self.order_table = Order.OrderTable()
         self.editable_columns = [2, 3, 5]  # Drilling Operation, Start Time, and Pass Quality Control are editable
         self._setup_ui()
@@ -16,6 +18,8 @@ class OperatorWindow(UserWindow):
     def _setup_ui(self):
         self._create_work_order_widget()
         self._setup_work_order_table()
+        self._create_add_customer_widget()
+        self._setup_customer_table()
 
     def _setup_work_order_table(self):
         self.table = QTableWidget(0, 6)
@@ -25,12 +29,26 @@ class OperatorWindow(UserWindow):
         self._populate_work_order_table()
         self.content_layout.addWidget(self.table)
 
+    def _setup_customer_table(self):
+        self.cust_table = QTableWidget(0, 4)
+        self.cust_table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
+        self.cust_table.setHorizontalHeaderLabels(["Customer ID", "Name", "Email", "Address"])
+        self._populate_customer_table()
+        self.content_layout.addWidget(self.cust_table)
+
     def _populate_work_order_table(self):
         self.table.clearContents()
         self.table.setRowCount(0)
         work_orders = self.order_table.get_all_orders()
         for work_order in work_orders:
             self._add_work_order_to_table(work_order)
+
+    def _populate_customer_table(self):
+        self.cust_table.clearContents()
+        self.cust_table.setRowCount(0)
+        customers = self.customer_table.get_all_customers()
+        for customer in customers:
+            self._add_customer_to_table(customer)
 
     def _add_work_order_to_table(self, work_order):
         row_idx = self.table.rowCount()
@@ -48,6 +66,20 @@ class OperatorWindow(UserWindow):
             if col_idx not in self.editable_columns:
                 table_item.setFlags(table_item.flags() & ~Qt.ItemIsEditable)
             self.table.setItem(row_idx, col_idx, table_item)
+
+    def _add_customer_to_table(self, customer):
+        row_idx = self.cust_table.rowCount()
+        self.cust_table.insertRow(row_idx)
+        items = [
+            customer.customerid,
+            customer.customername,
+            customer.customeremail,
+            customer.customeraddress
+        ]
+        for col_idx, item in enumerate(items):
+            table_item = QTableWidgetItem(str(item))
+            table_item.setFlags(table_item.flags() & ~Qt.ItemIsEditable)
+            self.cust_table.setItem(row_idx, col_idx, table_item)
 
     def _create_work_order_widget(self):
         widget = QWidget()
@@ -87,6 +119,41 @@ class OperatorWindow(UserWindow):
         self.customer_id.clear()
         self.drilling_operation.setCurrentIndex(0)
         self.start_time.setDateTime(QDateTimeEdit().dateTime())
+
+    def _create_add_customer_widget(self):
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.addWidget(QLabel("Add Customer"))
+
+        self.customer_name = QLineEdit()
+        self.customer_email = QLineEdit()
+        self.customer_address = QLineEdit()
+
+        for label, w in [("Customer Name", self.customer_name),
+                         ("Customer Email", self.customer_email),
+                         ("Customer Address", self.customer_address)]:
+            layout.addWidget(QLabel(label))
+            layout.addWidget(w)
+
+        submit_button = QPushButton("Add Customer")
+        submit_button.clicked.connect(self._submit_customer)
+        layout.addWidget(submit_button)
+
+        self.content_layout.addWidget(widget)
+
+    def _submit_customer(self):
+        customer_name = self.customer_name.text()
+        customer_email = self.customer_email.text()
+        customer_address = self.customer_address.text()
+
+        self.customer_table.add_customer(customer_name, customer_email, customer_address)
+
+        self._populate_customer_table()
+
+        # Clear input fields after submission
+        self.customer_name.clear()
+        self.customer_email.clear()
+        self.customer_address.clear()
 
     def _handle_item_changed(self, item):
         if item.column() in self.editable_columns:

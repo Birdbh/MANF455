@@ -1,16 +1,16 @@
-from sqlalchemy import create_engine, Column, Integer, String, Enum, DateTime, Interval
+from sqlalchemy import create_engine, Column, Integer, String, Enum, DateTime, Interval, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from data import DatabaseConnector
 import datetime
 
-Base = declarative_base()
+from data.DatabaseConnector import Base, engine, Session
 
 class Downtime(Base):
     __tablename__ = 'downtime'
 
     downtimeId = Column(Integer, primary_key=True, autoincrement=True)
-    employeeId = Column(Integer, nullable=False)
+    employeeId = Column(Integer, ForeignKey('employee.employeeId'), nullable=False,)
     downtimeReason = Column(Enum("Machine Fault", "Product Malfunction", "Labour Incident", name="downtime_reason_types"), nullable=False)
     downtimeStart = Column(DateTime, nullable=False)
     downtimeEnd = Column(DateTime, nullable=True)
@@ -19,8 +19,8 @@ class Downtime(Base):
 
 class DowntimeTable:
     def __init__(self):
-        self.engine = create_engine("sqlite:///MESDATABASE")
-        self.Session = sessionmaker(bind=self.engine)
+        self.engine = engine
+        self.Session = Session
         self.create_table()
 
     def create_table(self):

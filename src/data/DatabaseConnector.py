@@ -1,6 +1,13 @@
 import sqlite3
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 DATABASE_NAME = 'MESDATABASE'
+
+engine = create_engine("sqlite:///MESDATABASE")
+Session = sessionmaker(bind=engine)
+Base = declarative_base()
 
 class Database:
     _connection = None
