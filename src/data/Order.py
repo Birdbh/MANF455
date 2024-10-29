@@ -11,6 +11,7 @@ if project_root not in sys.path:
     
 from data.DatabaseConnector import Base, engine, Session
 
+#TODO: Add foreign key constraint and add an employee_id column
 
 class Order(Base):
     __tablename__ = 'orders'
