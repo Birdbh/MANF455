@@ -3,7 +3,7 @@ import code
 
 from opcua import Client
 from ComsManager import ComsManager
-
+#example
 IP_ADDRESS ="opc.tcp://172.21.3.1:4840"
 NS_NUMBER = 3
 
