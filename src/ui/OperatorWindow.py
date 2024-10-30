@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QLineEdit,
-                             QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView)
+                             QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QMessageBox)
 from PyQt5.QtCore import Qt
 from data import Order
 from data import Customer
@@ -110,6 +110,11 @@ class OperatorWindow(UserWindow):
         customer_id = int(self.customer_id.text())
         drilling_operation = int(self.drilling_operation.currentText())
         start_time = self.start_time.dateTime().toString("yyyy-MM-dd hh:mm:ss")
+
+        if customer_id not in [customer.customerid for customer in self.customer_table.get_all_customers()]:
+            QMessageBox.warning(self, "Work Order Submission Failed", "Invalid Customer ID")
+            self.customer_id.clear()
+            return
 
         self.order_table.add_order(customer_id, drilling_operation, start_time, "Pending", True)
 
