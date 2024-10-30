@@ -35,7 +35,7 @@ class Node():
         self.ns_number = NS_NUMBER
         self.datablock = datablock
         self.tag_name = tag_name
-        self.address = "ns=" + str(self.ns_number) + ";s=" + self.datablock + "." + self.tag_name + '"'
+        self.address = 'ns=' + str(self.ns_number) + ';s="' + self.datablock + '"."' + self.tag_name + '"'
         self.past_value = None
         self.current_value = None
         self.rising_edge = False
@@ -66,7 +66,7 @@ class Client():
         try:
             self.client.connect()
             for node in NodeList.get_nodes():
-                self.subscribe_node(node)
+                self.subscribe_nodes(node)
 
             time.sleep(0.1)
             embed()
@@ -78,4 +78,5 @@ class Client():
         node_address = node.address
         handler = SubHandler()
         sub = self.client.create_subscription(500, handler)
-        handle = sub.subscribe_data_change(node_address)
+        variable = self.client.get_node(node_address)
+        handle = sub.subscribe_data_change(variable)
