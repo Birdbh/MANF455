@@ -65,8 +65,10 @@ class Client():
 
         try:
             self.client.connect()
+            handler = SubHandler()
+
             for node in NodeList.get_nodes():
-                self.subscribe_nodes(node)
+                self.subscribe_nodes(node, handler)
 
             time.sleep(0.1)
             embed()
@@ -74,9 +76,8 @@ class Client():
         finally:
             self.client.disconnect()
 
-    def subscribe_nodes(self, node):
+    def subscribe_nodes(self, node, handler):
         node_address = node.address
-        handler = SubHandler()
         sub = self.client.create_subscription(500, handler)
         variable = self.client.get_node(node_address)
         handle = sub.subscribe_data_change(variable)
