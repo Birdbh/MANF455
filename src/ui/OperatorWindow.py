@@ -190,6 +190,12 @@ class OperatorWindow(UserWindow):
                 self._delete_order(order_id, row)
 
     def _delete_order(self, order_id, row):
+        status = self.table.item(row, 4).text()
+        
+        if status == "Completed":
+            QMessageBox.warning(self, "Cannot Delete", "Completed orders cannot be deleted")
+            return
+            
         reply = QMessageBox.question(self, 'Delete Order', 
                                 'Are you sure you want to delete this order?',
                                 QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
