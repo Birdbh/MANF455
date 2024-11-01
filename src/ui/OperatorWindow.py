@@ -67,7 +67,7 @@ class OperatorWindow(UserWindow):
         ]
         for col_idx, item in enumerate(items):
             table_item = QTableWidgetItem(str(item))
-            if col_idx not in self.editable_columns:
+            if work_order.status == "Completed" or col_idx not in self.editable_columns:
                 table_item.setFlags(table_item.flags() & ~Qt.ItemIsEditable)
             self.table.setItem(row_idx, col_idx, table_item)
 
