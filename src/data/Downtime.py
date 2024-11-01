@@ -72,6 +72,9 @@ class DowntimeTable:
             Downtime.downtimeStart >= date,
             Downtime.downtimeEnd <= date_next_day
             ).all()
-        total_downtime = sum([downtime.downtimeDelta.total_seconds() for downtime in downtimes], datetime.timedelta())
+        
+        total_seconds = sum(downtime.downtimeDelta.total_seconds() for downtime in downtimes)
+        total_downtime = datetime.timedelta(seconds=total_seconds)
+        
         session.close()
         return total_downtime
