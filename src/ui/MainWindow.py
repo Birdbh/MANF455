@@ -52,7 +52,10 @@ class MainWindow(QMainWindow):
 
     def show_template(self, role, employee_id, employee_name):
         if role == "Operator":
-            self.setCentralWidget(OperatorWindow.OperatorWindow(employee_id, employee_name))
+            try:
+                self.setCentralWidget(OperatorWindow.OperatorWindow(employee_id, employee_name))
+            except:
+                QMessageBox.warning(self, "Error", "An error occurred while loading the Operator window")
         elif role == "Technician":
             self.setCentralWidget(MaintenanceTechnicianWindow.MaintenanceTechnicianWindow(employee_id, employee_name))
         elif role == "Manager":
