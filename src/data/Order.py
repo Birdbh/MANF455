@@ -112,3 +112,12 @@ class OrderTable:
         ).count()
         session.close()
         return total_good_parts_produced
+    
+    def delete_order(self, order_id: int):
+        session = self.Session()
+        order = session.query(Order).filter_by(orderId=order_id).first()
+        if order:
+            session.delete(order)
+            session.commit()
+        session.close()
+        return True

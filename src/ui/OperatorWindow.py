@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QLineEdit,
-                             QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QMessageBox)
+                             QComboBox, QDateTimeEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QMessageBox, QMenu)
 from PyQt5.QtCore import Qt
 from data import Order
 from data import Customer
@@ -26,6 +26,10 @@ class OperatorWindow(UserWindow):
         self.table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.table.setHorizontalHeaderLabels(["Work Order ID", "Customer ID", "Drilling Operation", "Start Time", "Status", "Pass Quality Control"])
         self.table.itemChanged.connect(self._handle_item_changed)
+
+        self.table.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.table.customContextMenuRequested.connect(self._show_context_menu)
+
         self._populate_work_order_table()
         self.content_layout.addWidget(self.table)
 
@@ -173,3 +177,27 @@ class OperatorWindow(UserWindow):
                 self.order_table.update_start_time(work_order_id, new_value)
             elif column == 5: # Quality Check
                 self.order_table.update_pass_quality_control(work_order_id, new_value.lower() == 'true')
+
+    def _show_context_menu(self, position):
+        row = self.table.rowAt(position.y())
+        if row >= 0:  # Only show menu if user clicked on a row
+            menu = QMenu()
+            delete_action = menu.addAction("Delete Order")
+            action = menu.exec_(self.table.viewport().mapToGlobal(position))
+            
+            if action == delete_action:
+                order_id = int(self.table.item(row, 0).text())
+                self._delete_order(order_id, row)
+
+    def _delete_order(self, order_id, row):
+        reply = QMessageBox.question(self, 'Delete Order', 
+                                'Are you sure you want to delete this order?',
+                                QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+
+        if reply == QMessageBox.Yes:
+            try:
+                self.order_table.delete_order(order_id)
+                self.table.removeRow(row)
+                QMessageBox.information(self, "Success", "Order deleted successfully")
+            except:
+                QMessageBox.warning(self, "Error", "Failed to delete order")
