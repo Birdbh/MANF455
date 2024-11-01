@@ -57,9 +57,15 @@ class MainWindow(QMainWindow):
             except:
                 QMessageBox.warning(self, "Error", "An error occurred while loading the Operator window")
         elif role == "Technician":
-            self.setCentralWidget(MaintenanceTechnicianWindow.MaintenanceTechnicianWindow(employee_id, employee_name))
+            try:
+                self.setCentralWidget(MaintenanceTechnicianWindow.MaintenanceTechnicianWindow(employee_id, employee_name))
+            except Exception as error:
+                QMessageBox.warning(self, "An Error Has Occured", error)
         elif role == "Manager":
-            self.setCentralWidget(ManagerWindow.ManagerWindow(employee_id, employee_name))
+            try:
+                self.setCentralWidget(ManagerWindow.ManagerWindow(employee_id, employee_name))
+            except:
+                QMessageBox.warning(self, "Error", "An error occurred while loading the Manager window")
 
     def initialize_set_and_activate_sign_in_window(self):
         self.sign_in_template = SignInWindow.SignInWindow()
