@@ -1,17 +1,11 @@
 import time
 import code
 
-from opcua import Client
-from ComsManager import ComsManager
+from opcua import Client, ua
 
 IP_ADDRESS ="opc.tcp://172.21.3.1:4840"
 NS_NUMBER = 3
-
-def embed():
-    vars = globals()
-    vars.update(locals())
-    shell = code.InteractiveConsole(vars)
-    shell.interact()
+global client
 
 class NodeList:
     _instance = None
@@ -36,18 +30,23 @@ class Node():
         self.datablock = datablock
         self.tag_name = tag_name
         self.address = 'ns=' + str(self.ns_number) + ';s="' + self.datablock + '"."' + self.tag_name + '"'
-        self.past_value = None
-        self.current_value = None
+        self.past_value = False
+        self.current_value = False
         self.rising_edge = False
         NodeList.add_node(self)
 
     def update_rising_edge(self):
-        if self.past_value is True and self.current_value is False:
+        if self.past_value is False and self.current_value is True:
             self.rising_edge = True
-        elif self.past_value is False and self.current_value is True:
-            self.rising_edge = False
         else:
             self.rising_edge = False
+
+    def write(self, value):
+        try:
+            node = client.get_node(self.address)  # Access the global client variable
+            node.set_value(ua.DataValue(ua.Variant(value, node.get_data_type_as_variant_type())))
+        except Exception as e:
+            print(e)
 
 class SubHandler(object):
     def datachange_notification(self, node, val, data):
@@ -58,26 +57,24 @@ class SubHandler(object):
                 potential_node.current_value = val
                 potential_node.update_rising_edge()
 
-class Client():
+class PLC_COM():
 
     def __init__(self):
-        self.client = Client(IP_ADDRESS)
+        global client
+        client = Client(IP_ADDRESS)
 
         try:
-            self.client.connect()
+            client.connect()
             handler = SubHandler()
 
             for node in NodeList.get_nodes():
                 self.subscribe_nodes(node, handler)
 
-            time.sleep(0.1)
-            embed()
-
         finally:
-            self.client.disconnect()
+            client.disconnect()
 
     def subscribe_nodes(self, node, handler):
         node_address = node.address
-        sub = self.client.create_subscription(500, handler)
-        variable = self.client.get_node(node_address)
+        sub = client.create_subscription(500, handler)
+        variable = client.get_node(node_address)
         handle = sub.subscribe_data_change(variable)

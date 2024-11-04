@@ -121,3 +121,13 @@ class OrderTable:
             session.commit()
         session.close()
         return True
+    
+    def get_all_proccesing_orders_from_today_before_the_current_time(self):
+        session = self.Session()
+        current_time = datetime.datetime.now()
+        orders = session.query(Order).filter(
+            Order.order_date <= current_time,
+            Order.status == "Processing"
+        ).all()
+        session.close()
+        return orders

@@ -45,10 +45,8 @@ class Node:
         NodeList.add_node(self)
 
     def update_rising_edge(self):
-        if self.past_value is True and self.current_value is False:
+        if self.past_value is False and self.current_value is True:
             self.rising_edge = True
-        elif self.past_value is False and self.current_value is True:
-            self.rising_edge = False
         else:
             self.rising_edge = False
 

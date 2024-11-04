@@ -2,9 +2,13 @@ import sys
 from PyQt5.QtWidgets import QApplication
 from ui.MainWindow import MainWindow
 from data import Customer
+from coms import ComsManager
 
 def main():
     app = QApplication(sys.argv)
+
+    coms_manager = ComsManager.ComsManager()
+
     main_window = MainWindow()
     main_window.show()
     sys.exit(app.exec_())
