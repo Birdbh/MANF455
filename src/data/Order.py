@@ -127,7 +127,7 @@ class OrderTable:
         current_time = datetime.datetime.now()
         orders = session.query(Order).filter(
             Order.order_date <= current_time,
-            Order.status == "Processing"
+            Order.status == "Pending"
         ).all()
         session.close()
         return orders

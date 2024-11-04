@@ -18,12 +18,10 @@ class ComsManager():
         self.thread = threading.Thread(target=self.loop, daemon=True)
         self.thread.start()
 
-        self.loop()
-
     def loop(self):
         while True:
             if self.presenceNode.rising_edge and not self.queueEmpty():
-                    task_code, orderId = self.firstItemInQueueTaskCodeAndOrderID()
+                    task_code, orderId = self.firstItemInQueueTaskCode()
                     self.TaskCode.write(task_code)
                     data_to_write = self.RFIDArrayToWrite(task_code, orderId)
                     self.orderId.write(data_to_write)
@@ -40,11 +38,13 @@ class ComsManager():
     def firstItemInQueueTaskCode(self):
         #select all items from the order database where the status is Pending and the start time is less tahn the current time but in this day
         results = self.order_table.get_all_proccesing_orders_from_today_before_the_current_time()
-        orderId = results[0].orderId
-        task_code = results[0].drilling_operation
-        #set the order as completed
-        self.order_table.set_status_completed(orderId)
-        return task_code, orderId
+        if results:
+            orderId = results[0].orderId
+            task_code = results[0].drilling_operation
+            #set the order as completed
+            self.order_table.set_status_completed(orderId)
+            return task_code, orderId
+        return None
     
     def RFIDArrayToWrite(self, task_code, orderID):
         #the first number in data_to_write shoudl be the task_code, the remaining ones should be the orderID, one digit of the number in each entry of the array
