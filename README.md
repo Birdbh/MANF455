@@ -61,3 +61,33 @@ graph TB
     style OEECalc fill:#fff3e0,stroke:#333
     style CommsManager fill:#fce4ec,stroke:#333
 ```
+
+```mermaid
+graph TB
+    subgraph High Level
+    UI[User Interface]
+    end
+
+    subgraph Mid Level
+    AN[Analytics]
+    DB[(Database)]
+    end
+
+    subgraph Low Level
+    COM[Communications]
+    end
+
+    UI -->|Requests Data| DB
+    UI -->|Requests Report| AN
+    AN -->|Queries| DB
+    AN -->|Returns Report| UI
+    DB -->|Returns Data| UI
+    DB -->|Returns Data| AN
+    DB -->|Data Stream| COM
+    COM -->|Updates| DB
+
+    style DB fill:#f9f,stroke:#333,stroke-width:4px
+    style UI fill:#bbf,stroke:#333,stroke-width:2px
+    style AN fill:#ddf,stroke:#333,stroke-width:2px
+    style COM fill:#fdd,stroke:#333,stroke-width:2px
+```
