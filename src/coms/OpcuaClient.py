@@ -52,7 +52,7 @@ class SubHandler(object):
     def datachange_notification(self, node, val, data):
 
         for potential_node in NodeList.get_nodes():
-            if node == potential_node.address:
+            if str(node) == potential_node.address:
                 potential_node.past_value = potential_node.current_value
                 potential_node.current_value = val
                 potential_node.update_rising_edge()

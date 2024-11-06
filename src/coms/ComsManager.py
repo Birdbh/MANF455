@@ -7,13 +7,13 @@ import threading
 import time
 class ComsManager():
     def __init__(self):
-        self.plc = PLC_COM()
         self.presenceNode = Node("LIOLink_RF200_ReadTag_DB", "presence")
         self.TaskCode = Node("abstractMachine", "task_code")
         self.orderId = Node("identData", "writeData")
         self.order_table = OrderTable()
 
         self.nodes = NodeList()
+        self.plc = PLC_COM()
 
         self.thread = threading.Thread(target=self.loop, daemon=True)
         self.thread.start()
@@ -21,10 +21,13 @@ class ComsManager():
     def loop(self):
         while True:
             if self.presenceNode.rising_edge and not self.queueEmpty():
-                    task_code, orderId = self.firstItemInQueueTaskCode()
-                    self.TaskCode.write(task_code)
-                    data_to_write = self.RFIDArrayToWrite(task_code, orderId)
-                    self.orderId.write(data_to_write)
+                task_code, orderId = self.firstItemInQueueTaskCode()
+                self.TaskCode.write(task_code)
+                data_to_write = self.RFIDArrayToWrite(task_code, orderId)
+                self.orderId.write(data_to_write)
+
+            elif self.presenceNode.rising_edge and self.queueEmpty():
+                self.TaskCode.write(-1)
 
             time.sleep(0.2)
 
