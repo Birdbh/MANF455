@@ -132,3 +132,60 @@ erDiagram
         string status
     }
 ```
+
+```mermaid
+classDiagram
+    class NodeList {
+        - _instance: NodeList
+        - _nodes: list<Node>
+        + new() NodeList
+        + add_node(node: Node)
+        + get_nodes() list<Node>
+    }
+
+    class Node {
+        - ns_number: int
+        - datablock: str
+        - tag_name: str
+        - address: str
+        - past_value: bool
+        - current_value: bool
+        - rising_edge: bool
+        + update_rising_edge()
+        + write(value: Any)
+    }
+
+    class SubHandler {
+        + datachange_notification(node: Node, val: Any, data: Any)
+    }
+
+    class PLC_COM {
+        + init()
+        + subscribe_nodes(node: Node, handler: SubHandler)
+    }
+
+    %% Relationships
+    NodeList "1" *-- "0..*" Node : "stores"
+    Node "1" --> "1" NodeList : "adds itself"
+    SubHandler "1" --> "1" NodeList : "accesses"
+    PLC_COM "1" --> "1" SubHandler : "uses for notifications"
+    PLC_COM "1" --> "0..*" Node : "subscribes to"
+
+    %% Descriptions
+    class NodeList {
+        <<singleton>> 
+        Singleton class to store and manage nodes
+    }
+
+    class Node {
+        Represents a data point, updates state, and writes to PLC
+    }
+
+    class SubHandler {
+        Handles data changes and updates node state
+    }
+
+    class PLC_COM {
+        Manages PLC communication and subscribes to nodes
+    }
+```
