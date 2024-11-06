@@ -91,3 +91,44 @@ graph TB
     style AN fill:#ddf,stroke:#333,stroke-width:2px
     style COM fill:#fdd,stroke:#333,stroke-width:2px
 ```
+
+```mermaid
+erDiagram
+    CUSTOMER ||--o{ ORDER : places
+    EMPLOYEE ||--o{ DOWNTIME : reports
+    EMPLOYEE }|--o{ ORDER : processes
+
+    CUSTOMER {
+        int customerid PK
+        string customername
+        string customeremail
+        string customeraddress
+    }
+
+    ORDER {
+        int orderId PK
+        int customer_id FK
+        int drilling_operation
+        datetime order_date
+        string status
+        boolean passQualityControl
+    }
+
+    EMPLOYEE {
+        int employeeId PK
+        string name
+        string username
+        string password
+        string role
+    }
+
+    DOWNTIME {
+        int downtimeId PK
+        int employeeId FK
+        string downtimeReason
+        datetime downtimeStart
+        datetime downtimeEnd
+        interval downtimeDelta
+        string status
+    }
+```
