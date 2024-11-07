@@ -28,15 +28,18 @@ class ComsManager():
                 self.TaskCode.write(task_code)
                 data_to_write = self.RFIDArrayToWrite(task_code, orderId)
                 self.orderId.write(data_to_write)
+                self.update_order_display_table()
             
             elif self.presenceNode.rising_edge and self.queueEmpty():
                 self.presenceNode.rising_edge = False
                 self.TaskCode.write(-1)
+                self.update_order_display_table()
 
             time.sleep(0.2)
 
     def update_order_display_table(self):
-        print(type(self.main_window.centralWidget))
+        if (str(type(self.main_window.centralWidget())) == "<class 'ui.OperatorWindow.OperatorWindow'>"):
+            self.main_window.centralWidget()._populate_work_order_table()
 
     def queueEmpty(self):
         #select all items from the order database where the status is Pending and the start time is less tahn the current time but in this day
