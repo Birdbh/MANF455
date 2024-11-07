@@ -7,9 +7,9 @@ from coms import ComsManager
 def main():
     app = QApplication(sys.argv)
 
-    coms_manager = ComsManager.ComsManager()
-
     main_window = MainWindow()
+    coms_manager = ComsManager.ComsManager(main_window)
+
     main_window.show()
     sys.exit(app.exec_())
 

@@ -6,7 +6,9 @@ import threading
 
 import time
 class ComsManager():
-    def __init__(self):
+    def __init__(self, main_window):
+        self.main_window = main_window
+
         self.presenceNode = Node("abstractMachine", "pres_blk")
         self.TaskCode = Node("abstractMachine", "task_code")
         self.orderId = Node("identData", "writeData")
@@ -22,7 +24,6 @@ class ComsManager():
         while True:
             if self.presenceNode.rising_edge and not self.queueEmpty():
                 self.presenceNode.rising_edge = False
-                print("got here")
                 task_code, orderId = self.firstItemInQueueTaskCode()
                 self.TaskCode.write(task_code)
                 data_to_write = self.RFIDArrayToWrite(task_code, orderId)
@@ -33,6 +34,9 @@ class ComsManager():
                 self.TaskCode.write(-1)
 
             time.sleep(0.2)
+
+    def update_order_display_table(self):
+        print(type(self.main_window.centralWidget))
 
     def queueEmpty(self):
         #select all items from the order database where the status is Pending and the start time is less tahn the current time but in this day
@@ -49,6 +53,7 @@ class ComsManager():
             task_code = results[0].drilling_operation
             #set the order as completed
             self.order_table.set_status_completed(orderId)
+
             return task_code, orderId
         return None
     
