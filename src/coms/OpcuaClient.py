@@ -38,6 +38,7 @@ class Node():
     def update_rising_edge(self):
         if self.past_value is False and self.current_value is True:
             self.rising_edge = True
+            print("Rising edge detected")
         else:
             self.rising_edge = False
 
