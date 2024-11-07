@@ -71,8 +71,8 @@ class PLC_COM():
             for node in NodeList.get_nodes():
                 self.subscribe_nodes(node, handler)
 
-        finally:
-            client.disconnect()
+        except Exception as e:
+            print(e)
 
     def subscribe_nodes(self, node, handler):
         node_address = node.address

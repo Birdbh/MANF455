@@ -2,7 +2,7 @@ from data.Order import OrderTable
 from data.Downtime import DowntimeTable
 import pandas as pd
 
-TOTAL_RUN_TIME_HOURS_IN_ONE_DAY = 8
+TOTAL_RUN_TIME_HOURS_IN_ONE_DAY = 2
 PARTS_PRODUCED_PER_HOUR = 40
 
 class OEECalculator:
