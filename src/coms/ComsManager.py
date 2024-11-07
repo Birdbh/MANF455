@@ -7,7 +7,7 @@ import threading
 import time
 class ComsManager():
     def __init__(self):
-        self.presenceNode = Node("LIOLink_RF200_ReadTag_DB", "presence")
+        self.presenceNode = Node("abstractMachine", "pres_blk")
         self.TaskCode = Node("abstractMachine", "task_code")
         self.orderId = Node("identData", "writeData")
         self.order_table = OrderTable()
@@ -21,12 +21,15 @@ class ComsManager():
     def loop(self):
         while True:
             if self.presenceNode.rising_edge and not self.queueEmpty():
+                self.presenceNode.rising_edge = False
+                print("got here")
                 task_code, orderId = self.firstItemInQueueTaskCode()
                 self.TaskCode.write(task_code)
                 data_to_write = self.RFIDArrayToWrite(task_code, orderId)
                 self.orderId.write(data_to_write)
-
+            
             elif self.presenceNode.rising_edge and self.queueEmpty():
+                self.presenceNode.rising_edge = False
                 self.TaskCode.write(-1)
 
             time.sleep(0.2)
@@ -59,5 +62,3 @@ class ComsManager():
         while len(data_to_write) < 32:
             data_to_write.append(0)
         return data_to_write
-
-
