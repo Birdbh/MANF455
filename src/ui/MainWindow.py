@@ -54,7 +54,7 @@ class MainWindow(QMainWindow):
         if role == "Operator":
             try:
                 self.setCentralWidget(OperatorWindow.OperatorWindow(employee_id, employee_name))
-            except:
+            except Exception as error:
                 QMessageBox.warning(self, "Error", "An error occurred while loading the Operator window")
         elif role == "Technician":
             try:
