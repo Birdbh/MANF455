@@ -7,9 +7,6 @@ from datetime import datetime
 from ui.UserWindow import UserWindow
 from data.OEECalculator import OEECalculator
 
-from fpdf import FPDF
-from tabulate import tabulate
-
 class ManagerWindow(UserWindow):
     def __init__(self, employee_id, employee_name):
         super().__init__(employee_id, employee_name)
