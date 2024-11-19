@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from data import DatabaseConnector
 import datetime
+import pandas as pd
 
 from data.DatabaseConnector import Base, engine, Session
 
@@ -78,3 +79,13 @@ class DowntimeTable:
         
         session.close()
         return total_downtime
+    
+    def get_all_data(self):
+        session = self.Session()
+        data = session.query(Downtime).all()
+        session.close()
+        return data
+    
+    def turn_all_data_into_dataframe(self):
+        data = self.get_all_data()
+        return pd.DataFrame([vars(downtime) for downtime in data])

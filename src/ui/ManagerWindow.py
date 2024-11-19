@@ -1,11 +1,14 @@
 from PyQt5.QtWidgets import (QLabel, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog)
 import pandas as pd
 import pyqtgraph as pg
-from data import Employee
+from data import Employee, Downtime
 import pypdf
 from datetime import datetime
 from ui.UserWindow import UserWindow
 from data.OEECalculator import OEECalculator
+
+from fpdf import FPDF
+from tabulate import tabulate
 
 class ManagerWindow(UserWindow):
     def __init__(self, employee_id, employee_name):
@@ -19,7 +22,7 @@ class ManagerWindow(UserWindow):
         self._setup_oee_chart()
 
     def _add_button(self):
-        button = QPushButton("Generate Report")
+        button = QPushButton("Generate Downtime Report")
         button.clicked.connect(self._handle_button_click)
         self.content_layout.addWidget(button)
 
@@ -30,11 +33,29 @@ class ManagerWindow(UserWindow):
             self._generate_empty_pdf(file_name)
 
     def _generate_empty_pdf(self, file_name):
-        pdf_writer = pypdf.PdfWriter()
-        pdf_writer.add_blank_page(width=612, height=792)  # Standard letter size
+        # pdf_writer = pypdf.PdfWriter()
+        # downtime_table = Downtime.DowntimeTable()
+
+        # df = downtime_table.turn_all_data_into_dataframe()
+
+        # pdf = FPDF()
+        # pdf.add_page()
+        # pdf.set_font("Arial", size=12)
+        # pdf.multi_cell(0, 10, tabulate(df.values, headers=df.columns, tablefmt="grid"))
+        # pdf.output("dataframe.pdf")
         
-        with open(file_name, 'wb') as file:
-            pdf_writer.write(file)
+        pdf_writer = pypdf.PdfWriter()
+        downtime_table = Downtime.DowntimeTable()
+
+        df = downtime_table.turn_all_data_into_dataframe()
+
+        df.to_csv("dataframe.csv", index=False)
+        
+        # pdf_writer.add_blank_page(width=612, height=792)  # Standard letter size
+        
+        # with open(file_name, 'wb') as file:
+        #     pdf_writer.write(file)
+
 
     def _setup_employee_table(self):
         self.table = QTableWidget()
@@ -43,7 +64,7 @@ class ManagerWindow(UserWindow):
         self._populate_employee_table()
         self.content_layout.addWidget(self.table)
 
-        export_button = QPushButton("Export to CSV")
+        export_button = QPushButton("Export Employee Table to CSV")
         export_button.clicked.connect(self._export_to_csv)
         self.content_layout.addWidget(export_button)
 
