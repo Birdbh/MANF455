@@ -6,6 +6,7 @@ import pypdf
 from datetime import datetime
 from ui.UserWindow import UserWindow
 from data.OEECalculator import OEECalculator
+from data.ReportGenerator import ReportGenerator
 
 class ManagerWindow(UserWindow):
     def __init__(self, employee_id, employee_name):
@@ -27,32 +28,17 @@ class ManagerWindow(UserWindow):
         options = QFileDialog.Options()
         file_name, _ = QFileDialog.getSaveFileName(self, "Save PDF Report", "", "PDF Files (*.pdf)", options=options)
         if file_name:
-            self._generate_empty_pdf(file_name)
+            downtime_table = Downtime.DowntimeTable()
+            # Create ReportGenerator with the selected file path
+            report_gen = ReportGenerator(file_name)
+            df = downtime_table.turn_all_data_into_dataframe()
+            report_gen.generate_report(df)
 
     def _generate_empty_pdf(self, file_name):
-        # pdf_writer = pypdf.PdfWriter()
-        # downtime_table = Downtime.DowntimeTable()
-
-        # df = downtime_table.turn_all_data_into_dataframe()
-
-        # pdf = FPDF()
-        # pdf.add_page()
-        # pdf.set_font("Arial", size=12)
-        # pdf.multi_cell(0, 10, tabulate(df.values, headers=df.columns, tablefmt="grid"))
-        # pdf.output("dataframe.pdf")
-        
-        pdf_writer = pypdf.PdfWriter()
         downtime_table = Downtime.DowntimeTable()
-
+        report_gen = ReportGenerator("downtime_report.pdf")
         df = downtime_table.turn_all_data_into_dataframe()
-
-        df.to_csv("dataframe.csv", index=False)
-        
-        # pdf_writer.add_blank_page(width=612, height=792)  # Standard letter size
-        
-        # with open(file_name, 'wb') as file:
-        #     pdf_writer.write(file)
-
+        report_gen.generate_report(df)
 
     def _setup_employee_table(self):
         self.table = QTableWidget()
