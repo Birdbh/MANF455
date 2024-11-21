@@ -3,3 +3,7 @@ pyqtgraph
 opcua
 pyPDF
 sqlalchemy
+reportlab
+datetime
+pandas
+sqlite3
