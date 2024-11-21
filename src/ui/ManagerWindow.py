@@ -131,7 +131,7 @@ class ManagerWindow(UserWindow):
         self.employee_name1.clear()
         self.employee_username1.clear()
         self.employee_Password1.clear()
-        self.employee_role1()
+        self.employee_role1.clear()
         
     
    
