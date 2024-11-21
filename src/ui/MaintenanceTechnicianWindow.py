@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QLabel, QComboBox, 
-                             QPushButton, QStackedWidget)
+                             QPushButton, QStackedWidget,QTableWidget, QTableWidgetItem)
 from data import Downtime
 from .UserWindow import UserWindow
 
@@ -13,6 +13,22 @@ class MaintenanceTechnicianWindow(UserWindow):
         self._add_downtime_display()
         self._add_downtime_forms()
         self.update_downtime_display()
+        self._setup_downtime_table()
+
+    def _setup_downtime_table(self):
+        self.downtime_table = QTableWidget()
+        self.downtime_table.setColumnCount(3)
+        self.downtime_table.setHorizontalHeaderLabels(["Downtime ID", "Employee ID", "Reason"])
+        self._populate_downtime_table()
+        self.content_layout.addWidget(self.downtime_table)
+
+    def _populate_downtime_table(self):
+        downtimes = self.downtime.get_all_data()
+        self.downtime_table.setRowCount(len(downtimes))
+        for row_idx, downtime in enumerate(downtimes):
+            self.downtime_table.setItem(row_idx, 0, QTableWidgetItem(str(downtime.downtimeId)))
+            self.downtime_table.setItem(row_idx, 1, QTableWidgetItem(str(downtime.employeeId)))
+            self.downtime_table.setItem(row_idx, 2, QTableWidgetItem(downtime.downtimeReason))
 
     def _add_downtime_forms(self):
         self.downtime_stack = QStackedWidget()
@@ -53,6 +69,7 @@ class MaintenanceTechnicianWindow(UserWindow):
     def _end_downtime(self):
         self.downtime.end_downtime()
         self.update_downtime_display()
+        self._populate_downtime_table()
 
     def update_downtime_display(self):
         if self.downtime.is_currently_downtime():
