@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import (QLabel, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog)
+from PyQt5.QtWidgets import (QLabel, QPushButton, QTableWidget, QTableWidgetItem, QFileDialog,QWidget,QLineEdit,QComboBox,QVBoxLayout)
 import pandas as pd
 import pyqtgraph as pg
 from data import Employee, Downtime
@@ -18,6 +18,7 @@ class ManagerWindow(UserWindow):
         self._add_button()
         self._setup_employee_table()
         self._setup_oee_chart()
+        self._create_add_employee_widget()
 
     def _add_button(self):
         button = QPushButton("Generate Downtime Report")
@@ -88,3 +89,49 @@ class ManagerWindow(UserWindow):
     def _get_oee_data(self):
         oee = OEECalculator()
         return oee.get_past_week_of_oee()
+    
+    def _create_add_employee_widget(self):
+        widget = QWidget()
+        layout = QVBoxLayout(widget)
+        layout.addWidget(QLabel("Add Employee"))
+        
+        self.employee_username1 = QLineEdit()
+        self.employee_Password1 = QLineEdit()
+        self.employee_name1 = QLineEdit()
+        self.employee_role1 = QComboBox()
+        self.employee_role1.addItems(["Manager", "Technician", "Operator"])
+        
+        
+
+        for label, w in [("Employee Name", self.employee_name1),
+                         ("Employee Username", self.employee_username1),
+                         ("Employee Password", self.employee_Password1),
+                         ("Employee Role", self.employee_role1)]:
+            layout.addWidget(QLabel(label))
+            layout.addWidget(w)
+
+        submit_button1 = QPushButton("Add Employee")
+        submit_button1.clicked.connect(self._submit_employee)
+        layout.addWidget(submit_button1)
+
+        self.content_layout.addWidget(widget)
+
+    def _submit_employee(self):
+        Employee_name = self.employee_name1.text()
+        Employee_username=self.employee_username1.text()
+        Employee_password=self.employee_Password1.text()
+        Employee_role = self.employee_role1.currentText()
+        
+
+        self.employee_table.add_employee(Employee_name,Employee_username,Employee_password,Employee_role)
+
+        self._populate_employee_table()
+
+        # Clear input fields after submission
+        self.employee_name1.clear()
+        self.employee_username1.clear()
+        self.employee_Password1.clear()
+        self.employee_role1()
+        
+    
+   
