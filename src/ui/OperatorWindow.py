@@ -43,7 +43,7 @@ class OperatorWindow(UserWindow):
     def _populate_work_order_table(self):
         self.table.clearContents()
         self.table.setRowCount(0)
-        work_orders = self.order_table.get_all_orders_from_today()
+        work_orders = self.order_table.get_all_orders_from_today_or_pending_orders_from_the_past()
         for work_order in work_orders:
             self._add_work_order_to_table(work_order)
 

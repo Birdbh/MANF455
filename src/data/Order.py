@@ -151,3 +151,14 @@ class OrderTable:
         ).all()
         session.close()
         return orders
+    
+    def get_all_orders_from_today_or_pending_orders_from_the_past(self):
+        session = self.Session()
+        current_time = datetime.datetime.now()
+        orders = session.query(Order).filter(
+            (Order.order_date >= current_time.replace(hour=0, minute=0, second=0)) &
+            (Order.order_date <= current_time.replace(hour=23, minute=59, second=59)) |
+            (Order.status == "Pending")
+        ).all()
+        session.close()
+        return orders
