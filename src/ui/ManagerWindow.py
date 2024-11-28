@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import (QLabel, QPushButton, QTableWidget, QTableWidgetItem
 import pandas as pd
 import pyqtgraph as pg
 from data import Employee, Downtime
-import pypdf
 from datetime import datetime
 from ui.UserWindow import UserWindow
 from data.OEECalculator import OEECalculator
